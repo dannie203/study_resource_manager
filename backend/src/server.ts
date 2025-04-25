@@ -10,8 +10,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('api/auth', authRoutes);
-app.use('api/resources', resourceRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/resources', resourceRoutes);
 
 app.get('/', (req, res) => {
   res.send('🎉 API is working!');
