@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import resourceRoutes from './routes/resource';
 
+
 dotenv.config();
 
 const app = express();
@@ -21,3 +22,8 @@ const PORT = process.env.PORT ?? 5000;
 app.listen(PORT, () => {
   console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
+
+app.use(cors({
+  origin: 'http://localhost:3000', // cho phép frontend gọi API
+  credentials: true,
+}));
