@@ -1,0 +1,84 @@
+import { Request, Response } from 'express';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+// Multer config
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const uploadDir = path.join(__dirname, '../../uploads');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, `${uniqueSuffix}-${file.originalname}`);
+    },
+  }),
+  fileFilter: (req, file, cb) => {
+    const allowedMimeTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only PDF and DOCX files are allowed.'));
+    }
+  },
+  limits: {
+    fileSize: 500 * 1024 * 1024, 
+  },
+}).single('file');
+
+// Controller
+export const uploadFile = async (req: Request, res: Response) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded.' });
+    }
+
+    try {
+      const { title, subject } = req.body;
+      const userIdString = (req as any).user?.id; 
+      const userId = parseInt(userIdString, 10);
+
+      if (!title || !subject) {
+        return res.status(400).json({ error: 'Title and subject are required.' });
+      }
+
+      if (!userId || isNaN(userId)) {
+        return res.status(401).json({ error: 'Unauthorized: Invalid user ID.' });
+      }
+
+      const resource = await prisma.resource.create({
+        data: {
+          title,
+          subject,
+          fileUrl: `/uploads/${req.file.filename}`,
+          createdBy: userId,
+        },
+      });
+
+      res.status(201).json({
+        message: 'File uploaded successfully.',
+        resource,
+      });
+    } catch (error) {
+      console.error('Error processing uploaded file:', error);
+      res.status(500).json({
+        error: 'An unexpected error occurred while processing the uploaded file.',
+      });
+    }
+  });
+};

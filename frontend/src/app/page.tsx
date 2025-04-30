@@ -1,34 +1,21 @@
-import Link from "next/link";
-
 export default function LandingPage() {
-  return (
-    <main className="flex items-center justify-center min-h-screen bg-white text-gray-900">
-      <div className="text-center space-y-6">
-        <h1 className="text-4xl font-bold">Welcome to StudyShare!</h1>
-        <p className="text-lg text-gray-600">
-          Your collaborative platform for sharing learning resources.
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-neutral-950 px-4">
+        <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+          Chào mừng đến với Study Resource Manager
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-xl">
+          Nơi quản lý tài nguyên học tập hiệu quả, trực quan và nhanh chóng.
         </p>
-        <div className="flex flex-col items-center space-y-4">
-          <Link
-            href="/dashboard"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
-          >
-            Go to Dashboard
-          </Link>
-          <Link
-            href="/login"
-            className="inline-block px-6 py-3 bg-gray-100 text-gray-800 rounded-lg shadow hover:bg-gray-200 transition"
-          >
-            Login
-          </Link>
-          <Link
-            href="/register"
-            className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition"
-          >
-            Register
-          </Link>
+        <div className="flex space-x-4">
+          <a href="/auth/login" className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+            Đăng nhập
+          </a>
+          <a href="/auth/register" className="px-6 py-3 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition">
+            Tạo tài khoản
+          </a>
         </div>
-      </div>
-    </main>
-  );
-}
+      </main>
+    );
+  }
+  
