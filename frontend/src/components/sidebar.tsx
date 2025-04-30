@@ -24,10 +24,6 @@ export default function Sidebar() {
           <CloudArrowUpIcon className="h-5 w-5 mr-2" />
           Upload
         </a>
-        <a href="/download" className="flex items-center text-blue-600 hover:underline">
-          <ArrowDownTrayIcon className="h-5 w-5 mr-2" />
-          Download
-        </a>
       </nav>
     </aside>
   );
