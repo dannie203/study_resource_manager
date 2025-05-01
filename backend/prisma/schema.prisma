@@ -3,17 +3,20 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" 
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  username  String    @unique
-  password  String
-  resources Resource[]
-  createdAt DateTime  @default(now())
+  id                   String     @id @default(uuid())
+  email                String     @unique
+  username             String     @unique
+  password             String
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @default(now()) @updatedAt
+  Resource             Resource[]
 }
 
 model Resource {
@@ -23,6 +26,6 @@ model Resource {
   fileUrl   String
   createdAt DateTime @default(now())
 
-  createdBy Int
-  user      User     @relation(fields: [createdBy], references: [id])
+  createdBy String
+  user      User   @relation(fields: [createdBy], references: [id])
 }

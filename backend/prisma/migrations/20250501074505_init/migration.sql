@@ -1,10 +1,13 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "passwordResetToken" TEXT,
+    "passwordResetExpires" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -16,7 +19,7 @@ CREATE TABLE "Resource" (
     "subject" TEXT NOT NULL,
     "fileUrl" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" INTEGER NOT NULL,
+    "createdBy" TEXT NOT NULL,
 
     CONSTRAINT "Resource_pkey" PRIMARY KEY ("id")
 );

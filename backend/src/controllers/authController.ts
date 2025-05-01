@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '.prisma/client';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { generateToken } from '../utils/jwt';
+import { sendEmail } from '../utils/sendEmail';
 
 const prisma = new PrismaClient();
 
@@ -15,7 +17,6 @@ export const register = async (req: Request, res: Response): Promise<Response> =
       return res.status(400).json({ error: 'Email, username và password là bắt buộc.' });
     }
 
-    // Kiểm tra trùng email hoặc username
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [{ email }, { username }]
@@ -47,7 +48,7 @@ export const register = async (req: Request, res: Response): Promise<Response> =
   }
 };
 
-// Đăng nhập (dùng username hoặc email)
+// Đăng nhập
 export const login = async (req: Request, res: Response): Promise<Response> => {
   const { identifier, password } = req.body;
 
@@ -91,5 +92,88 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
   } catch (err) {
     console.error('Lỗi đăng nhập:', err);
     return res.status(500).json({ error: 'Không thể đăng nhập. Vui lòng thử lại sau.' });
+  }
+};
+
+// Gửi email reset mật khẩu
+export const requestPasswordReset = async (req: Request, res: Response): Promise<Response> => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ error: 'Email là bắt buộc.' });
+
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = await bcrypt.hash(resetToken, 10);
+    const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 phút
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordResetToken: hashedToken,
+        passwordResetExpires: expires,
+      }
+    });
+
+    await sendEmail(
+      user.email,
+      'Yêu cầu đặt lại mật khẩu',
+      `<p>Chào ${user.username},</p>
+       <p>Bạn đã yêu cầu đặt lại mật khẩu. Dưới đây là mã token:</p>
+       <code>${resetToken}</code>
+       <p>Mã này sẽ hết hạn sau 15 phút.</p>`
+    );
+
+    return res.json({ message: 'Đã gửi email reset mật khẩu (nếu email tồn tại).' });
+
+  } catch (err) {
+    console.error('Lỗi tạo token reset:', err);
+    return res.status(500).json({ error: 'Lỗi máy chủ khi gửi yêu cầu.' });
+  }
+};
+
+// Reset mật khẩu bằng token
+export const resetPassword = async (req: Request, res: Response): Promise<Response> => {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res.status(400).json({ error: 'Token và mật khẩu mới là bắt buộc.' });
+  }
+
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        passwordResetExpires: { gt: new Date() },
+        NOT: { passwordResetToken: null },
+      },
+    });
+
+    const user = users.find(u => bcrypt.compareSync(token, u.passwordResetToken!));
+
+    if (!user) {
+      return res.status(400).json({ error: 'Token không hợp lệ hoặc đã hết hạn.' });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedNewPassword,
+        passwordResetToken: null,
+        passwordResetExpires: null,
+      },
+    });
+
+    return res.json({ message: 'Đã cập nhật mật khẩu thành công.' });
+
+  } catch (err) {
+    console.error('Lỗi reset mật khẩu:', err);
+    return res.status(500).json({ error: 'Không thể reset mật khẩu.' });
   }
 };

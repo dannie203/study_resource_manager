@@ -5,7 +5,7 @@ import {
   HomeIcon,
   UserIcon,
   CloudArrowUpIcon,
-  ArrowDownTrayIcon,
+ 
 } from '@heroicons/react/24/outline';
 
 export default function Sidebar() {
