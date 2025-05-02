@@ -33,12 +33,12 @@ const upload = multer({
     }
   },
   limits: {
-    fileSize: 500 * 1024 * 1024, 
+    fileSize: 500 * 1024 * 1024, // 500MB
   },
 }).single('file');
 
 // Controller
-export const uploadFile = async (req: Request, res: Response) => {
+export const uploadFile = async (req: Request, res: Response): Promise<void> => {
   upload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
@@ -50,14 +50,13 @@ export const uploadFile = async (req: Request, res: Response) => {
 
     try {
       const { title, subject } = req.body;
-      const userIdString = (req as any).user?.id; 
-      const userId = parseInt(userIdString, 10);
+      const userId = (req as any).user?.id;
 
       if (!title || !subject) {
         return res.status(400).json({ error: 'Title and subject are required.' });
       }
 
-      if (!userId || isNaN(userId)) {
+      if (!userId || typeof userId !== 'string') {
         return res.status(401).json({ error: 'Unauthorized: Invalid user ID.' });
       }
 
@@ -66,7 +65,7 @@ export const uploadFile = async (req: Request, res: Response) => {
           title,
           subject,
           fileUrl: `/uploads/${req.file.filename}`,
-          createdBy: userIdString,
+          createdBy: userId,
         },
       });
 

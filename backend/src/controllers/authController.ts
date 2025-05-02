@@ -18,9 +18,7 @@ export const register = async (req: Request, res: Response): Promise<Response> =
     }
 
     const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }]
-      }
+      where: { OR: [{ email }, { username }] }
     });
 
     if (existingUser) {
@@ -30,11 +28,7 @@ export const register = async (req: Request, res: Response): Promise<Response> =
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await prisma.user.create({
-      data: {
-        email,
-        username,
-        password: hashedPassword
-      }
+      data: { email, username, password: hashedPassword }
     });
 
     return res.status(201).json({
@@ -58,12 +52,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     }
 
     const user = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { username: identifier },
-          { email: identifier }
-        ]
-      }
+      where: { OR: [{ username: identifier }, { email: identifier }] }
     });
 
     if (!user) {
@@ -95,7 +84,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
   }
 };
 
-// Gửi email reset mật khẩu
+// Gửi liên kết reset mật khẩu qua email
 export const requestPasswordReset = async (req: Request, res: Response): Promise<Response> => {
   const { email } = req.body;
 
@@ -120,16 +109,18 @@ export const requestPasswordReset = async (req: Request, res: Response): Promise
       }
     });
 
+    const resetUrl = `http://localhost:3000/auth/reset-password?token=${resetToken}`;
+
     await sendEmail(
       user.email,
       'Yêu cầu đặt lại mật khẩu',
       `<p>Chào ${user.username},</p>
-       <p>Bạn đã yêu cầu đặt lại mật khẩu. Dưới đây là mã token:</p>
-       <code>${resetToken}</code>
-       <p>Mã này sẽ hết hạn sau 15 phút.</p>`
+       <p>Bạn đã yêu cầu đặt lại mật khẩu. Nhấn vào liên kết bên dưới để tiếp tục:</p>
+       <a href="${resetUrl}" target="_blank">${resetUrl}</a>
+       <p>Liên kết sẽ hết hạn sau 15 phút.</p>`
     );
 
-    return res.json({ message: 'Đã gửi email reset mật khẩu (nếu email tồn tại).' });
+    return res.json({ message: 'Liên kết đặt lại mật khẩu đã được gửi tới email (nếu tồn tại).' });
 
   } catch (err) {
     console.error('Lỗi tạo token reset:', err);
@@ -175,5 +166,35 @@ export const resetPassword = async (req: Request, res: Response): Promise<Respon
   } catch (err) {
     console.error('Lỗi reset mật khẩu:', err);
     return res.status(500).json({ error: 'Không thể reset mật khẩu.' });
+  }
+};
+
+// ✅ Kiểm tra token còn hợp lệ hay không
+export const validateResetToken = async (req: Request, res: Response): Promise<Response> => {
+  const { token } = req.query;
+
+  if (!token || typeof token !== 'string') {
+    return res.status(400).json({ error: 'Token không hợp lệ.' });
+  }
+
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        passwordResetExpires: { gt: new Date() },
+        NOT: { passwordResetToken: null },
+      },
+    });
+
+    const user = users.find(u => bcrypt.compareSync(token, u.passwordResetToken!));
+
+    if (!user) {
+      return res.status(400).json({ error: 'Token không tồn tại hoặc đã hết hạn.' });
+    }
+
+    return res.json({ message: 'Token hợp lệ.' });
+
+  } catch (err) {
+    console.error('Lỗi kiểm tra token:', err);
+    return res.status(500).json({ error: 'Không thể xác thực token.' });
   }
 };

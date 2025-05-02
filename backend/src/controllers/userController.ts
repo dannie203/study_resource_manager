@@ -8,7 +8,7 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
 
   try {
     const user = await prisma.user.findUnique({
-      where: { id: Number(userId) }, // ép kiểu cho chắc
+      where: { id: String(userId) }, // ép kiểu cho chắc
       select: {
         id: true,
         username: true,

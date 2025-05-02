@@ -6,7 +6,7 @@ import Sidebar from '@/components/sidebar';
  * ProfileLayout
  * This layout wraps the profile page and provides a consistent structure.
  */
-export default function ProfileLayout({ children }: { children: ReactNode }) {
+export default function UploadFunction ({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-neutral-950">
       {/* Optional Sidebar */}

@@ -3,7 +3,8 @@ import {
   register,
   login,
   requestPasswordReset,
-  resetPassword
+  resetPassword,
+  validateResetToken, 
 } from '../controllers/authController';
 
 const router = express.Router();
@@ -18,5 +19,5 @@ router.post('/register', asyncHandler(register));
 router.post('/login', asyncHandler(login));
 router.post('/request-reset', asyncHandler(requestPasswordReset));
 router.post('/reset-password', asyncHandler(resetPassword));
-
+router.get('/validate-reset-token', asyncHandler(validateResetToken)); 
 export default router;

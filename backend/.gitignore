@@ -27,3 +27,5 @@ build/
 .vscode/
 .idea/
 *.iml
+# Upload folder
+uploads/

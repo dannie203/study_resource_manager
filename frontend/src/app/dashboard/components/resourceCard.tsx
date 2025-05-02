@@ -1,32 +1,32 @@
 'use client';
 
+interface Resource {
+  id: string;
+  title: string;
+  subject: string;
+  fileUrl: string;
+  createdBy: string;
+}
+
 interface ResourceCardProps {
-  resources: {
-    id: string;
-    title: string;
-    subject: string;
-    fileUrl: string;
-    createdBy: string;
-  }[];
+  resources: Resource[];
 }
 
 export default function ResourceCard({ resources }: ResourceCardProps) {
   if (resources.length === 0) {
-    // Render message and upload button if no data exists
     return (
       <div className="text-center mt-8">
-        <p className="text-gray-600 mb-4">No data in the database.</p>
+        <p className="text-gray-600 mb-4">Chưa có tài nguyên nào.</p>
         <a
           href="/upload"
           className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
         >
-          Upload Data
+          Tải tài nguyên lên
         </a>
       </div>
     );
   }
 
-  // Render resource cards if data exists
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
       {resources.map((resource) => (
@@ -34,18 +34,24 @@ export default function ResourceCard({ resources }: ResourceCardProps) {
           key={resource.id}
           className="border rounded-lg p-4 shadow-md hover:shadow-lg transition"
         >
-          <h2 className="text-xl font-semibold mb-2">{resource.title || 'No Title'}</h2>
+          <h2 className="text-xl font-semibold mb-2">
+            {resource.title || 'Không có tiêu đề'}
+          </h2>
           <p className="text-gray-600 mb-2">
-            Môn học: {resource.subject || 'No Subject'}
+            Môn học: {resource.subject || 'Không rõ'}
           </p>
-          <a
-            href={resource.fileUrl || '#'}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
-          >
-            {resource.fileUrl ? 'Tải xuống tài liệu' : 'No File Available'}
-          </a>
+
+          {resource.fileUrl ? (
+            <a
+              href={`http://localhost:5000${resource.fileUrl}`}
+              download
+              className="text-blue-600 hover:underline"
+            >
+              Tải xuống tài liệu
+            </a>
+          ) : (
+            <p className="text-red-500">Không có tệp đính kèm</p>
+          )}
         </div>
       ))}
     </div>
