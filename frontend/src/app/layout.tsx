@@ -1,19 +1,32 @@
+"use client";
 
-import './globals.css';
+import "./globals.css";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import Splash from "@/components/splash";
 
-export const metadata = {
-  title: 'StudyShare',
-  description: 'Share learning resources',
-};
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const [loading, setLoading] = useState(true);
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+  useEffect(() => {
+    if (pathname === "/") {
+      const timer = setTimeout(() => setLoading(false), 3000);
+      return () => clearTimeout(timer);
+    } else {
+      setLoading(false);
+    }
+  }, [pathname]);
+
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="vi">
+      <head>
+        <title>Mấy Đứa Hay Học</title>
+        <link rel="icon" href="/favicon.ico" />
+      </head>
+      <body>
+        {loading ? <Splash /> : children}
+      </body>
     </html>
   );
 }

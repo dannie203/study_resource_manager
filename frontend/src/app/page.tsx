@@ -2,10 +2,10 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-neutral-950 px-4">
       <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-        Chào mừng đến với Study Resource Manager
+        Chào mừng đến với Mấy Đứa Hay Học
       </h1>
       <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-xl">
-        Nơi quản lý tài nguyên học tập hiệu quả, trực quan và nhanh chóng.
+        TRUNG TÂM QUẢN LÝ TÀI LIỆU CỦA MẤY ĐỨA HAY HỌC
       </p>
       
       {/* Group all buttons vertically */}
