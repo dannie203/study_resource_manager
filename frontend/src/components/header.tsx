@@ -7,11 +7,11 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 right-0 h-16 bg-white dark:bg-neutral-900 shadow-md flex items-center px-6 transition-all duration-300 z-30 ${
-        isCollapsed ? 'ml-20 w-[calc(100%-5rem)]' : 'ml-64 w-[calc(100%-16rem)]'
-      }`}
+      className={`relative w-full h-16 bg-white dark:bg-neutral-900 shadow-md flex items-center px-6 transition-all duration-300 z-30`}
     >
-      <h1 className="text-xl font-bold text-neutral-800 dark:text-white">
+      <h1 className={`text-xl font-bold text-neutral-800 dark:text-white ${
+        isCollapsed ? 'lg:pl-20 xl:pl-20' : 'lg:pl-64 xl:pl-64'
+      }`}>
         Resource Manager
       </h1>
     </header>
