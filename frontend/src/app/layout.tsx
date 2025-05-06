@@ -4,6 +4,8 @@ import "./globals.css";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Splash from "@/components/splash";
+import Head from "next/head";
+import { SidebarProvider } from "@/context/sidebarContext";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -20,12 +22,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="vi">
-      <head>
+      <Head>
         <title>Mấy Đứa Hay Học</title>
         <link rel="icon" href="/favicon.ico" />
-      </head>
+      </Head>
       <body>
-        {loading ? <Splash /> : children}
+        <SidebarProvider>
+          {loading ? <Splash /> : children}
+        </SidebarProvider>
       </body>
     </html>
   );
