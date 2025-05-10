@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { PrismaClient } from '@prisma/client';
+import { decodeFileName } from '../utils/stringHelper';
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,7 @@ const upload = multer({
     },
     filename: (req, file, cb) => {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      const fileName = Buffer.from(file.originalname, 'latin1').toString('utf-8');
+      const fileName: string | null = decodeFileName(file.originalname);
       cb(null, `${uniqueSuffix}-${fileName}`);
     },
   }),
@@ -60,13 +61,19 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
       if (!userId || typeof userId !== 'string') {
         return res.status(401).json({ error: 'Unauthorized: Invalid user ID.' });
       }
+      // Decode POST-ed data
+      const fileName: string | null = decodeFileName(req.file.originalname);
+      if(!fileName) {
+        return res.status(400).json({ error: 'Invalid filename!' })
+      }
 
       const resource = await prisma.resource.create({
+      // const fileName: string | null = decodeFileName(file.originalname);
         data: {
           title,
           subject,
           fileUrl: `/uploads/${req.file.filename}`,
-          originalName: req.file.originalname,
+          originalName: fileName,
           createdBy: userId,
         },
       });
