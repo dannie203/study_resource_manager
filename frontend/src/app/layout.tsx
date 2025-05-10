@@ -1,35 +1,25 @@
-"use client";
+import './globals.css';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { AuthProvider } from '@/context/authContext';
+import { SidebarProvider } from '@/context/sidebarContext';
 
-import "./globals.css";
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import Splash from "@/components/splash";
-import Head from "next/head";
-import { SidebarProvider } from "@/context/sidebarContext";
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: 'Study Resource Manager',
+  description: 'một sản phầm của Mấy Đứa Hay Học',
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (pathname === "/") {
-      const timer = setTimeout(() => setLoading(false), 3000);
-      return () => clearTimeout(timer);
-    } else {
-      setLoading(false);
-    }
-  }, [pathname]);
-
-  return (
+  return ( 
     <html lang="vi">
-      <Head>
-        <title>Mấy Đứa Hay Học</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <body>
-        <SidebarProvider>
-          {loading ? <Splash /> : children}
-        </SidebarProvider>
+      <body className={`${inter.className} bg-[#121212] text-white min-h-screen`}>
+        <AuthProvider>
+          <SidebarProvider>
+            {children}
+          </SidebarProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,19 +1,25 @@
 'use client';
 
+import { Bars3Icon } from '@heroicons/react/24/outline';
 import { useSidebar } from '@/context/sidebarContext';
+import { useAuth } from '@/context/authContext';
+import { useEffect, useState } from 'react';
+import useBreakpoint from '@/hooks/useBreakpoint';
+import React from 'react';
 
 export default function Header() {
-  const { isCollapsed } = useSidebar();
+  const { setAuthenticated } = useAuth();
+  const { setIsMobileOpen } = useSidebar();
+  const { isMobile } = useBreakpoint();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setAuthenticated(false);
+  };
 
   return (
-    <header
-      className={`relative w-full h-16 bg-white dark:bg-neutral-900 shadow-md flex items-center px-6 transition-all duration-300 z-30`}
-    >
-      <h1 className={`text-xl font-bold text-neutral-800 dark:text-white ${
-        isCollapsed ? 'lg:pl-20 xl:pl-20' : 'lg:pl-64 xl:pl-64'
-      }`}>
-        Resource Manager
-      </h1>
+    <header className="w-full h-[80px] flex items-center px-6 bg-[#1e1e1e] shadow">
+      <h1 className="text-2xl font-bold">Dashboard Header</h1>
     </header>
   );
 }

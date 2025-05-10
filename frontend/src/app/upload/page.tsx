@@ -88,8 +88,18 @@ export default function UploadPage() {
         >
           {isSubmitting ? 'Đang tải lên...' : 'Tải lên'}
         </button>
-        {message && <p className="mt-2 text-sm text-red-600">{message}</p>}
       </form>
+      {message && (
+        <div
+          className={`mt-4 px-4 py-2 rounded text-sm font-medium ${
+            message.includes('thành công')
+              ? 'bg-green-100 text-green-700 border border-green-300'
+              : 'bg-red-100 text-red-700 border border-red-300'
+          }`}
+        >
+          {message}
+        </div>
+      )}
     </div>
   );
 }
