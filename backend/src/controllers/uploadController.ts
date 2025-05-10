@@ -65,6 +65,7 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
           title,
           subject,
           fileUrl: `/uploads/${req.file.filename}`,
+          originalName: req.file.originalname,
           createdBy: userId,
         },
       });

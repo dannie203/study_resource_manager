@@ -24,6 +24,7 @@ model Resource {
   title     String
   subject   String
   fileUrl   String
+  originalName String
   createdAt DateTime @default(now())
 
   createdBy String

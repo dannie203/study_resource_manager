@@ -18,6 +18,7 @@ CREATE TABLE "Resource" (
     "title" TEXT NOT NULL,
     "subject" TEXT NOT NULL,
     "fileUrl" TEXT NOT NULL,
+    "originalName" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT NOT NULL,
 
