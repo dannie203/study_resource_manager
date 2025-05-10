@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import useBreakpoint from '@/hooks/useBreakpoint';
 import React from 'react';
 
-export default function Header() {
+export default function Header({ title }) {
   const { setAuthenticated } = useAuth();
   const { setIsMobileOpen } = useSidebar();
   const { isMobile } = useBreakpoint();
@@ -19,7 +19,7 @@ export default function Header() {
 
   return (
     <header className="w-full h-[80px] flex items-center px-6 bg-[#1e1e1e] shadow">
-      <h1 className="text-2xl font-bold">Dashboard Header</h1>
+      <h1 className="text-2xl font-bold">{title}</h1>
     </header>
   );
 }
