@@ -18,7 +18,8 @@ const upload = multer({
     },
     filename: (req, file, cb) => {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      cb(null, `${uniqueSuffix}-${file.originalname}`);
+      const fileName = Buffer.from(file.originalname, 'latin1').toString('utf-8');
+      cb(null, `${uniqueSuffix}-${fileName}`);
     },
   }),
   fileFilter: (req, file, cb) => {
