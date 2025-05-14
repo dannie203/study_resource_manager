@@ -33,7 +33,7 @@ export default function LoginPage() {
 
       if (res.ok) {
         localStorage.setItem('token', data.token);
-        router.push('/dashboard');
+        window.location.reload(); // Reload để AuthProvider cập nhật context
       } else {
         setError(data.error ?? 'Đăng nhập thất bại');
       }

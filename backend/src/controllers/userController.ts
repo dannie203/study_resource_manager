@@ -27,3 +27,48 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: 'Lỗi máy chủ' });
   }
 };
+
+export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+    res.json(users);
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách user:', error);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+};
+
+export const updateUserRole = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const { role } = req.body;
+  try {
+    const user = await prisma.user.update({
+      where: { id },
+      data: { role },
+      select: { id: true, username: true, email: true, role: true },
+    });
+    res.json(user);
+  } catch (error) {
+    console.error('Lỗi khi cập nhật role user:', error);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+};
+
+export const deleteUser = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  try {
+    await prisma.user.delete({ where: { id } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Lỗi khi xoá user:', error);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+};

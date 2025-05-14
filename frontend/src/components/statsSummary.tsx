@@ -7,20 +7,25 @@ import {
 
 export default function StatsSummary() {
   return (
-    <section className="bg-[#1e1e1e] rounded-lg p-6 shadow mb-6">
-      <h2 className="text-xl font-semibold mb-4">Stats Summary</h2>
-      <div className="flex gap-8">
-        <div>
-          <div className="text-4xl font-bold">12</div>
-          <div className="text-gray-400">Resources</div>
+    <section className="bg-white rounded-2xl p-8 shadow-lg mb-8 border border-gray-100">
+      <h2 className="text-2xl font-bold mb-6 text-green-800 flex items-center gap-2">
+        <DocumentTextIcon className="w-7 h-7 text-green-600" /> Thống kê tổng quan
+      </h2>
+      <div className="flex gap-8 justify-between">
+        <div className="flex flex-col items-center flex-1 bg-green-50 rounded-xl p-5 shadow-sm">
+          <CloudArrowDownIcon className="w-8 h-8 text-green-500 mb-2" />
+          <div className="text-3xl font-bold text-green-700">12</div>
+          <div className="text-gray-600 mt-1">Tài liệu</div>
         </div>
-        <div>
-          <div className="text-4xl font-bold">5</div>
-          <div className="text-gray-400">Uploads</div>
+        <div className="flex flex-col items-center flex-1 bg-green-50 rounded-xl p-5 shadow-sm">
+          <UsersIcon className="w-8 h-8 text-green-500 mb-2" />
+          <div className="text-3xl font-bold text-green-700">5</div>
+          <div className="text-gray-600 mt-1">Tải lên</div>
         </div>
-        <div>
-          <div className="text-4xl font-bold">3</div>
-          <div className="text-gray-400">Downloads</div>
+        <div className="flex flex-col items-center flex-1 bg-green-50 rounded-xl p-5 shadow-sm">
+          <DocumentTextIcon className="w-8 h-8 text-green-500 mb-2" />
+          <div className="text-3xl font-bold text-green-700">3</div>
+          <div className="text-gray-600 mt-1">Tải xuống</div>
         </div>
       </div>
     </section>

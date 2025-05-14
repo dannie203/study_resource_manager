@@ -64,8 +64,8 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
       return res.status(401).json({ error: 'Sai mật khẩu.' });
     }
 
-    const token = generateToken({ id: user.id }, '1d');
-    const refreshToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, { expiresIn: '7d' });
+    const token = generateToken({ id: user.id, role: user.role }, '1d');
+    const refreshToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET!, { expiresIn: '7d' });
 
     return res.json({
       message: 'Đăng nhập thành công.',
