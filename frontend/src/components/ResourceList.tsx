@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import ResourceCard from './resourceCard';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '../context/authContext';
+import ResourceSearchBar from './ResourceSearchBar';
+import ResourcePagination from './ResourcePagination';
+import { useI18n } from '../context/i18nContext';
 
 interface Resource {
   id: number;
@@ -12,31 +14,46 @@ interface Resource {
   fileUrl: string;
   originalName: string;
   createdAt: string;
-  status?: string;
+  status?: string; // Thêm trường status để nhận đúng dữ liệu từ backend
 }
 
 export default function ResourceList() {
-  const { userRole } = useAuth();
+  const { t } = useI18n();
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const pageSize = 10;
 
   useEffect(() => {
     const fetchResources = async () => {
       const token = localStorage.getItem('token');
-      if (!token) return setLoading(false);
+      if (!token) {
+        toast.error('Bạn chưa đăng nhập.');
+        setLoading(false);
+        return;
+      }
       try {
         const res = await fetch('http://localhost:5000/api/resources', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error('Lỗi khi lấy tài liệu');
+        if (res.status === 401) {
+          toast.error('Phiên đăng nhập hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.');
+          localStorage.removeItem('token');
+          setTimeout(() => window.location.href = '/auth/login', 1500);
+          setResources([]);
+          return;
+        }
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          toast.error(data.error ?? 'Lỗi máy chủ khi lấy tài liệu!');
+          setResources([]);
+          return;
+        }
         const data = await res.json();
         setResources(data);
-      } catch {
-        toast.error('Lỗi khi lấy tài liệu!');
+      } catch (err) {
+        toast.error('Lỗi kết nối đến server. Vui lòng kiểm tra mạng hoặc thử lại sau!');
         setResources([]);
       } finally {
         setLoading(false);
@@ -45,63 +62,33 @@ export default function ResourceList() {
     fetchResources();
   }, []);
 
-  // Hàm xóa resource khỏi danh sách sau khi xóa thành công
-  const handleDeleteResource = (id: number) => {
-    setResources(resources => resources.filter(res => res.id !== id));
-  };
-
-  // Chỉ hiển thị tài nguyên đã duyệt hoặc tài nguyên của chính user (nếu là user)
-  let filtered = resources;
-  if (userRole === 'ADMIN') {
-    if (statusFilter !== 'ALL') filtered = filtered.filter(r => r.status === statusFilter);
-  } else {
-    filtered = filtered.filter(r => r.status === 'APPROVED' || r.status === undefined);
-  }
+  const filtered = resources.filter(r => r.title.toLowerCase().includes(search.toLowerCase()) || r.subject.toLowerCase().includes(search.toLowerCase()) || r.originalName.toLowerCase().includes(search.toLowerCase()));
   const paged = filtered.slice((page-1)*pageSize, page*pageSize);
   const totalPages = Math.ceil(filtered.length / pageSize);
 
   if (loading)
     return (
       <div className="flex justify-center items-center py-10">
-        <span className="text-green-700 text-lg font-semibold animate-pulse">Đang tải tài liệu...</span>
+        <span className="text-green-700 text-lg font-semibold animate-pulse">{t('loading') ?? 'Đang tải tài liệu...'}</span>
       </div>
     );
   if (!resources.length)
     return (
       <div className="flex flex-col items-center py-10 text-gray-400">
         <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path stroke="#9ca3af" strokeWidth="2" d="M7 17V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v10M7 17h10M7 17v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/></svg>
-        <span className="mt-2 text-base">Không có tài liệu nào.</span>
+        <span className="mt-2 text-base">{t('no_resource') ?? 'Không có tài liệu nào.'}</span>
       </div>
     );
 
   return (
     <div>
-      {userRole === 'ADMIN' && (
-        <div className="mb-4 flex items-center gap-4">
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="border px-3 py-2 rounded-lg">
-            <option value="ALL">Tất cả</option>
-            <option value="PENDING">Chờ duyệt</option>
-            <option value="APPROVED">Đã duyệt</option>
-            <option value="REJECTED">Từ chối</option>
-          </select>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Tìm kiếm..." className="border px-3 py-2 rounded-lg w-64" />
-        </div>
-      )}
-      {userRole !== 'ADMIN' && (
-        <div className="mb-4 flex items-center gap-4">
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Tìm kiếm..." className="border px-3 py-2 rounded-lg w-64" />
-        </div>
-      )}
+      <ResourceSearchBar value={search} onChange={setSearch} />
       <div className="space-y-5 px-2 max-w-2xl mx-auto">
         {paged.map((r) => (
-          <ResourceCard key={r.id} resource={r} onDelete={handleDeleteResource} />
+          <ResourceCard key={r.id} resource={r} />
         ))}
       </div>
-      <div className="flex justify-center mt-6 gap-2">
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button key={i} onClick={() => setPage(i+1)} className={`px-3 py-1 rounded ${page === i+1 ? 'bg-green-600 text-white' : 'bg-gray-200 text-green-800'}`}>{i+1}</button>
-        ))}
-      </div>
+      <ResourcePagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
 }
