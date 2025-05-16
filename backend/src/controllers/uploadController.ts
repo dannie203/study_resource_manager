@@ -54,13 +54,17 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
       const { title, subject } = req.body;
       const userId = (req as any).user?.id;
 
-      if (!title || !subject) {
-        return res.status(400).json({ error: 'Title and subject are required.' });
+      // Validate input
+      if (!title?.trim()) {
+        return res.status(400).json({ error: 'Tiêu đề tài liệu là bắt buộc.' });
       }
-
+      if (!subject?.trim()) {
+        return res.status(400).json({ error: 'Môn học là bắt buộc.' });
+      }
       if (!userId || typeof userId !== 'string') {
         return res.status(401).json({ error: 'Unauthorized: Invalid user ID.' });
       }
+
       // Decode POST-ed data
       const fileName: string | null = decodeFileName(req.file.originalname);
       if(!fileName) {

@@ -12,11 +12,19 @@ const prisma = new PrismaClient();
 export const register = async (req: Request, res: Response): Promise<Response> => {
   const { email, username, password } = req.body;
 
-  try {
-    if (!email || !username || !password) {
-      return res.status(400).json({ error: 'Email, username và password là bắt buộc.' });
-    }
+  // Validate input
+  if (!email || !username || !password) {
+    return res.status(400).json({ error: 'Email, username và password là bắt buộc.' });
+  }
+  // Validate email format
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    return res.status(400).json({ error: 'Email không hợp lệ.' });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Mật khẩu phải có ít nhất 6 ký tự.' });
+  }
 
+  try {
     const existingUser = await prisma.user.findFirst({
       where: { OR: [{ email }, { username }] }
     });
@@ -46,11 +54,12 @@ export const register = async (req: Request, res: Response): Promise<Response> =
 export const login = async (req: Request, res: Response): Promise<Response> => {
   const { identifier, password } = req.body;
 
-  try {
-    if (!identifier || !password) {
-      return res.status(400).json({ error: 'Vui lòng nhập username/email và mật khẩu.' });
-    }
+  // Validate input
+  if (!identifier || !password) {
+    return res.status(400).json({ error: 'Vui lòng nhập username/email và mật khẩu.' });
+  }
 
+  try {
     const user = await prisma.user.findFirst({
       where: { OR: [{ username: identifier }, { email: identifier }] }
     });
@@ -196,5 +205,21 @@ export const validateResetToken = async (req: Request, res: Response): Promise<R
   } catch (err) {
     console.error('Lỗi kiểm tra token:', err);
     return res.status(500).json({ error: 'Không thể xác thực token.' });
+  }
+};
+
+// Refresh token endpoint
+export const refreshToken = async (req: Request, res: Response): Promise<Response> => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    return res.status(400).json({ error: 'Refresh token là bắt buộc.' });
+  }
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET!) as { id: string, role: string };
+    // Có thể kiểm tra blacklist refresh token ở đây nếu muốn
+    const accessToken = generateToken({ id: decoded.id, role: decoded.role }, '1d');
+    return res.json({ accessToken });
+  } catch (err) {
+    return res.status(401).json({ error: 'Refresh token không hợp lệ hoặc đã hết hạn.' });
   }
 };
