@@ -21,6 +21,7 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    res.setHeader('Cache-Control', 'no-store'); // Không cho phép cache, luôn trả về 200
     res.json(user); 
   } catch (error) {
     console.error('Lỗi khi lấy thông tin user:', error);
@@ -69,6 +70,16 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     res.json({ success: true });
   } catch (error) {
     console.error('Lỗi khi xoá user:', error);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+};
+
+export const getUserStats = async (req: Request, res: Response) => {
+  try {
+    const totalUsers = await prisma.user.count();
+    res.json({ totalUsers });
+  } catch (error) {
+    console.error('Lỗi khi lấy tổng số user:', error);
     res.status(500).json({ error: 'Lỗi máy chủ' });
   }
 };

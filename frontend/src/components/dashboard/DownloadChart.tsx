@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend } from "chart.js";
+import { useI18n } from '../../context/i18nContext';
 Chart.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
 type ChartData = Record<string, number>;
 
 export default function DownloadChart() {
+  const { t } = useI18n();
   const [data, setData] = useState<ChartData>({});
   const [interval, setInterval] = useState("day");
 
@@ -24,15 +26,15 @@ export default function DownloadChart() {
   return (
     <div className="bg-white rounded-2xl p-6 mb-6 shadow border border-gray-100">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-green-800">Lượt tải xuống theo thời gian</h3>
+        <h3 className="font-semibold text-green-800">{t('download_chart')}</h3>
         <select
           className="bg-gray-100 text-green-800 rounded px-2 py-1 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400"
           value={interval}
           onChange={(e) => setInterval(e.target.value)}
         >
-          <option value="day">Ngày</option>
-          <option value="week">Tuần</option>
-          <option value="month">Tháng</option>
+          <option value="day">{t('day')}</option>
+          <option value="week">{t('week')}</option>
+          <option value="month">{t('month')}</option>
         </select>
       </div>
       <Line
@@ -40,10 +42,10 @@ export default function DownloadChart() {
           labels,
           datasets: [
             {
-              label: "Lượt tải xuống",
+              label: t('downloads'),
               data: values,
               borderColor: "#60a5fa",
-              backgroundColor: "rgba(96,165,250,0.2)",
+              backgroundColor: "rgba(4, 112, 245, 0.89)",
               tension: 0.3,
             },
           ],

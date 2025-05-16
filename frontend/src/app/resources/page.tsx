@@ -12,7 +12,7 @@ export default function ResourcesPage() {
       <Sidebar />
       <div className="flex flex-col flex-1">
         <Header title={"Resources"} />
-        <main className="p-6 max-w-3xl mx-auto w-full">
+        <main className="p-6 max-w-6xl mx-auto w-full main-bg">
           <h1 className="text-2xl font-bold mb-6 text-green-800">Tài liệu của bạn</h1>
           <ResourceList />
         </main>

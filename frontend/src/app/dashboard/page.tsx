@@ -13,7 +13,7 @@ export default function DashboardPage() {
       <Sidebar />
       <div className="flex flex-col flex-1">
         <Header title={"Dashboard"} />
-        <main className="p-6 max-w-6xl mx-auto w-full">
+        <main className="p-6 max-w-6xl mx-auto w-full main-bg">
           <StatsOverview />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             <ResourceCategoryChart />
