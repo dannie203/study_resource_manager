@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { Toaster, toast } from 'react-hot-toast';
 
 interface UserProfileData {
+  id: string;
   username: string;
   email: string;
 }
@@ -17,41 +18,37 @@ export default function UsersProfile() {
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem("token");
-
       if (!token) {
-        toast.error('Token is missing');
+        toast.error('Bạn chưa đăng nhập.');
         setLoading(false);
         return;
       }
-
       try {
-        const res = await fetch("http://localhost:5000/api/user/me", {
+        const res = await fetch("http://localhost:5000/api/users/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-
         const data = await res.json();
         if (!res.ok) {
-          if (data.error === "Token expired. Please log in again.") {
+          if (res.status === 401) {
             localStorage.removeItem("token");
             toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
             window.location.href = "/auth/login";
             return;
           }
           toast.error(data.error ?? 'Không thể tải thông tin người dùng.');
-          throw new Error(data.error ?? "Không thể tải thông tin người dùng.");
+          setProfile(null);
+        } else {
+          setProfile(data);
         }
-
-        setProfile(data);
       } catch (err) {
-        toast.error('Lỗi khi lấy hồ sơ người dùng!');
+        toast.error('Lỗi kết nối đến server. Vui lòng thử lại sau!');
         setProfile(null);
       } finally {
         setLoading(false);
       }
     };
-
     fetchProfile();
   }, []);
 
@@ -69,6 +66,10 @@ export default function UsersProfile() {
             </div>
           ) : profile ? (
             <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <span className="text-gray-500 text-sm">ID</span>
+                <span className="text-lg font-semibold text-green-700">{profile.id}</span>
+              </div>
               <div className="flex flex-col gap-2">
                 <span className="text-gray-500 text-sm">Tên đăng nhập</span>
                 <span className="text-lg font-semibold text-green-700">{profile.username}</span>
