@@ -14,9 +14,21 @@ export default function UploadPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage("");
+    if (!title.trim()) {
+      toast.error('Vui lòng nhập tiêu đề tài liệu.');
+      setMessage('Vui lòng nhập tiêu đề tài liệu.');
+      return;
+    }
+    if (!subject.trim()) {
+      toast.error('Vui lòng nhập môn học.');
+      setMessage('Vui lòng nhập môn học.');
+      return;
+    }
     if (!file) {
       toast.error('Vui lòng chọn một file.');
-      return setMessage('Vui lòng chọn một file.');
+      setMessage('Vui lòng chọn một file.');
+      return;
     }
 
     const formData = new FormData();

@@ -16,6 +16,23 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     setSuccess('');
+    if (!username.trim()) {
+      setError('Vui lòng nhập username.');
+      return;
+    }
+    if (!email.trim()) {
+      setError('Vui lòng nhập email.');
+      return;
+    }
+    // Validate email format
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setError('Email không hợp lệ.');
+      return;
+    }
+    if (!password.trim() || password.length < 6) {
+      setError('Mật khẩu phải có ít nhất 6 ký tự.');
+      return;
+    }
   
     try {
       const res = await fetch('http://localhost:5000/api/auth/register', {
