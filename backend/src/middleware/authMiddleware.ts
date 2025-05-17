@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export interface AuthRequest extends Request {
-  user?: { id: string };
+  user?: { id: string; role?: string };
 }
 
 export const authenticateToken = async (
@@ -31,7 +31,7 @@ export const authenticateToken = async (
       return;
     }
 
-    req.user = { id: decoded.id };
+    req.user = { id: decoded.id, role: user.role };
     next();
   } catch (err) {
     if (err instanceof TokenExpiredError) {
@@ -41,4 +41,16 @@ export const authenticateToken = async (
       res.status(403).json({ error: 'Forbidden: Invalid token.' });
     }
   }
+};
+
+export const requireAdmin = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (req.user?.role !== 'ADMIN') {
+    res.status(403).json({ error: 'Forbidden: Admins only.' });
+    return;
+  }
+  next();
 };

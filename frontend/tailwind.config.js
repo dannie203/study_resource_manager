@@ -7,5 +7,6 @@ module.exports = {
   theme: {
     extend: {},
   },
+  darkMode: 'media', // Enable dark mode based on user's OS/browser preference
   plugins: [],
 };
