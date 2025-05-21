@@ -2,7 +2,6 @@
 import { useAuth } from '@/context/authContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import Sidebar from '@/components/sidebar';
 import Header from '@/components/header';
 import React from 'react';
 import AdminSidebar from '@/components/adminSidebar';
