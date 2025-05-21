@@ -2,118 +2,137 @@
 
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Toaster, toast } from 'react-hot-toast';
+import { useI18n } from "@/context/i18nContext";
+import { useAuth } from '@/context/authContext';
+import { useRouter } from 'next/navigation';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function UploadPage() {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace('/auth/login');
+    }
+  }, [isAuthenticated, router]);
+  if (!isAuthenticated) return null;
+
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useI18n();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return setMessage("Vui lòng chọn một file.");
+    setMessage("");
+    if (!title.trim()) {
+      toast.error(t('upload_required_title'));
+      setMessage(t('upload_required_title'));
+      return;
+    }
+    if (!subject.trim()) {
+      toast.error(t('upload_required_subject'));
+      setMessage(t('upload_required_subject'));
+      return;
+    }
+    if (!file) {
+      toast.error(t('upload_required_file'));
+      setMessage(t('upload_required_file'));
+      return;
+    }
 
     const formData = new FormData();
     formData.append("title", title);
     formData.append("subject", subject);
     formData.append("file", file);
 
-    const token = localStorage.getItem("token"); // JWT đã lưu sau khi login
-
     try {
       setIsSubmitting(true);
-      const res = await fetch("http://localhost:5000/api/upload", {
+      toast.loading(t('uploading'));
+      const res = await fetch(`${API_URL}/api/upload`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include',
         body: formData,
       });
 
       const data = await res.json();
+      toast.dismiss();
+      if (res.status === 401) {
+        toast.error(t('session_expired'));
+        setTimeout(() => router.replace('/auth/login'), 1000);
+        return;
+      }
       if (res.ok) {
-        setMessage("Tải lên thành công!");
+        toast.success(t('upload_success'));
+        setMessage(t('upload_success'));
         setTitle("");
         setSubject("");
         setFile(null);
       } else {
-        setMessage(data.error ?? "Đã xảy ra lỗi khi tải lên.");
+        toast.error(data.error ?? t('upload_error'));
+        setMessage(data.error ?? t('upload_error'));
       }
     } catch (err) {
-      console.error(err);
-      setMessage("Lỗi kết nối đến server.");
+      toast.dismiss();
+      toast.error(t('upload_network_error'));
+      setMessage(t('upload_network_error'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <>
-      <div className="flex min-h-screen bg-[#121212] text-white font-sans">
-        <Sidebar />
-        <div className="flex flex-col flex-1">
-          <Header title={"Upload resource"} />
-          <main className="p-4">
-            <div className="max-w-xl mx-auto mt-10 bg-white dark:bg-neutral-900 p-6 rounded shadow">
-              <h2 className="text-2xl font-bold mb-4">Tải tài nguyên lên</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block mb-1 font-medium">Tiêu đề</label>
-                  <input
-                    type="text"
-                    className="w-full border rounded p-2"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block mb-1 font-medium">Môn học</label>
-                  <input
-                    type="text"
-                    className="w-full border rounded p-2"
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block mb-1 font-medium">
-                    Tệp (.pdf, .docx)
-                  </label>
-                  <input
-                    type="file"
-                    className="w-full"
-                    accept=".pdf,.docx"
-                    onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {isSubmitting ? "Đang tải lên..." : "Tải lên"}
-                </button>
-              </form>
-              {message && (
-                <div
-                  className={`mt-4 px-4 py-2 rounded text-sm font-medium ${
-                    message.includes("thành công")
-                      ? "bg-green-100 text-green-700 border border-green-300"
-                      : "bg-red-100 text-red-700 border border-red-300"
-                  }`}
-                >
-                  {message}
-                </div>
-              )}
-            </div>
-          </main>
-        </div>
+    <div className="flex min-h-screen main-bg text-[var(--clr-green-dark)] font-sans">
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+      <Sidebar />
+      <div className="flex flex-col flex-1">
+        <Header title={t('upload')} />
+        <main className="p-6 max-w-xl mx-auto w-full">
+          <h1 className="text-2xl font-bold mb-6 text-[var(--clr-green-dark)]">{t('upload_new_heading')}</h1>
+          <form
+            onSubmit={handleSubmit}
+            className="card-bg rounded-2xl shadow-lg p-8 flex flex-col gap-5 border border-[var(--clr-green-light)]"
+          >
+            <input
+              type="text"
+              placeholder={t('upload_title_placeholder')}
+              className="input border border-[var(--clr-green-light)] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--clr-green)] text-[var(--clr-green-dark)]"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+            <input
+              type="text"
+              placeholder={t('upload_subject_placeholder')}
+              className="input border border-[var(--clr-green-light)] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--clr-green)] text-[var(--clr-green-dark)]"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              required
+            />
+            <input
+              type="file"
+              className="block w-full text-sm text-[var(--clr-green-dark)] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[var(--clr-green-light)] file:text-[var(--clr-green-dark)] hover:file:bg-[var(--clr-green)]"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+              required
+            />
+            <button
+              type="submit"
+              className="btn-primary font-semibold rounded-lg px-6 py-2 shadow disabled:opacity-60"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? t('uploading') : t('upload_button')}
+            </button>
+            {message && (
+              <div className={`text-center text-sm font-medium ${message === t('upload_success') ? 'text-[var(--clr-green)]' : 'text-[var(--clr-red)]'}`}>{message}</div>
+            )}
+          </form>
+        </main>
       </div>
-    </>
+    </div>
   );
 }

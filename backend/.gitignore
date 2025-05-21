@@ -29,3 +29,4 @@ build/
 *.iml
 # Upload folder
 uploads/
+avatar/

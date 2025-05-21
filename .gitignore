@@ -1,0 +1,31 @@
+# Node
+node_modules/
+.env
+env.*
+
+# Build
+build/
+dist/
+.next/
+*.log
+
+# Prisma
+prisma/dev.db
+prisma/dev.db-journal
+
+# Uploads
+backend/uploads/
+
+# Ignore local IDE/editor files
+.vscode/
+.idea/
+.DS_Store
+
+# Ignore generated files
+*.tsbuildinfo
+
+# Ignore test output
+coverage/
+
+# Ignore checklist
+CHECKLIST.md

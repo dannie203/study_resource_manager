@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { PrismaClient } from '@prisma/client';
 import { decodeFileName } from '../utils/stringHelper';
+import { scanFile } from '../utils/clamav';
 
 const prisma = new PrismaClient();
 
@@ -53,13 +54,33 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
     try {
       const { title, subject } = req.body;
       const userId = (req as any).user?.id;
-
-      if (!title || !subject) {
-        return res.status(400).json({ error: 'Title and subject are required.' });
+       if (!title || !subject) {
+        return res.status(400).json({ error: 'Tiêu đề tài liệu là bắt buộc.' });
       }
-
+      // Validate input
+      if (!title?.trim()) {
+        return res.status(400).json({ error: 'Tiêu đề tài liệu là bắt buộc.' });
+      }
+      if (!subject?.trim()) {
+        return res.status(400).json({ error: 'Môn học là bắt buộc.' });
+      }
       if (!userId || typeof userId !== 'string') {
         return res.status(401).json({ error: 'Unauthorized: Invalid user ID.' });
+      }
+
+      // Quét virus bằng ClamAV
+      let scanResult = null;
+      try {
+        scanResult = await scanFile(req.file.path);
+        if (scanResult.isInfected) {
+          // Xóa file nhiễm virus
+          fs.unlinkSync(req.file.path);
+          return res.status(400).json({ error: `File bị nhiễm virus: ${scanResult.viruses?.join(', ') || 'Unknown malware'}` });
+        }
+      } 
+      catch (error) {
+        console.error('Error scanning file:', error);
+        return res.status(500).json({ error: 'Lỗi quét file' });
       }
       // Decode POST-ed data
       const fileName: string | null = decodeFileName(req.file.originalname);
@@ -68,7 +89,6 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
       }
 
       const resource = await prisma.resource.create({
-      // const fileName: string | null = decodeFileName(file.originalname);
         data: {
           title,
           subject,

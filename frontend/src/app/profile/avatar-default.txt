@@ -1,0 +1,5 @@
+https://ui-avatars.com/api/?name=User&background=E5E7EB&color=10B981&size=96
+https://api.dicebear.com/7.x/identicon/svg?seed=default
+https://api.dicebear.com/7.x/bottts/svg?seed=default
+https://api.dicebear.com/7.x/fun-emoji/svg?seed=default
+https://www.gravatar.com/avatar/?d=mp&s=96
