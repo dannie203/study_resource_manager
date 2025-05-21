@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Providers from './providers';
 import { I18nProvider } from '../context/i18nContext';
-
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {

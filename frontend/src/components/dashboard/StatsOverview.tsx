@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";import { useI18n } from '../../context/i18nContext';
 import { useAuth } from '../../context/authContext';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function StatsOverview() {
   const { t } = useI18n();
   const { userRole } = useAuth();
   const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/resources/stats", {
+    fetch(`${API_URL}/api/resources/stats`, {
       credentials: 'include',
     })
       .then((res) => res.json())

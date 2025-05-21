@@ -4,6 +4,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useI18n } from "../../../context/i18nContext";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 const ResetPasswordPage = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -22,7 +24,7 @@ const ResetPasswordPage = () => {
       }
 
       try {
-        const res = await fetch(`http://localhost:5000/api/auth/validate-reset-token?token=${token}`);
+        const res = await fetch(`${API_URL}/api/auth/validate-reset-token?token=${token}`);
         setIsValidToken(res.ok);
       } catch (err) {
         setIsValidToken(false);
@@ -34,7 +36,7 @@ const ResetPasswordPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:5000/api/auth/reset-password", {
+    const res = await fetch(`${API_URL}/api/auth/reset-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token, newPassword }),

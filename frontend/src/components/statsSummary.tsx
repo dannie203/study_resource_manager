@@ -5,6 +5,8 @@ import {
   CloudArrowDownIcon,
 } from '@heroicons/react/24/outline';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function StatsSummary() {
   const [stats, setStats] = useState<any>(null);
   const [userStats, setUserStats] = useState<any>(null);
@@ -12,7 +14,7 @@ export default function StatsSummary() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/resources/stats', {
+        const res = await fetch(`${API_URL}/api/resources/stats`, {
           credentials: 'include',
         });
         const data = await res.json();
@@ -21,7 +23,7 @@ export default function StatsSummary() {
     };
     const fetchUserStats = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/users/stats', {
+        const res = await fetch(`${API_URL}/api/users/stats`, {
           credentials: 'include',
         });
         const data = await res.json();

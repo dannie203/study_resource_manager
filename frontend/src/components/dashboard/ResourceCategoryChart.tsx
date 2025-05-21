@@ -6,12 +6,14 @@ Chart.register(ArcElement, Tooltip, Legend);
 
 type CategoryStat = { subject: string; count: number };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function ResourceCategoryChart() {
   const { t } = useI18n();
   const [data, setData] = useState<CategoryStat[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/resources/category-stats", {
+    fetch(`${API_URL}/api/resources/category-stats`, {
       credentials: 'include',
     })
       .then((res) => res.json())

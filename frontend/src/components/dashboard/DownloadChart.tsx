@@ -6,13 +6,15 @@ Chart.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, L
 
 type ChartData = Record<string, number>;
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function DownloadChart() {
   const { t } = useI18n();
   const [data, setData] = useState<ChartData>({});
   const [interval, setInterval] = useState("day");
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/resources/download-chart?interval=${interval}`, {
+    fetch(`${API_URL}/api/resources/download-chart?interval=${interval}`, {
       credentials: 'include',
     })
       .then((res) => res.json())

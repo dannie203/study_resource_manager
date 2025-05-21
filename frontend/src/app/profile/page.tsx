@@ -143,7 +143,7 @@ export default function UsersProfile() {
               {/* Avatar */}
               {profile.avatar && typeof profile.avatar === 'string' && profile.avatar.trim() !== '' ? (
                 <img
-                  src={`http://localhost:5000${profile.avatar}`}
+                  src={`${API_URL}${profile.avatar}`}
                   alt={profile.username + ' avatar'}
                   className="w-24 h-24 rounded-full object-cover border-4 border-[var(--clr-green-light)] mb-2 shadow-md transition-all duration-200 md:w-28 md:h-28 sm:w-20 sm:h-20 bg-white"
                   onError={e => { (e.target as HTMLImageElement).src = getDefaultAvatar(profile); }}

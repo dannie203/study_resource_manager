@@ -2,6 +2,8 @@ import React from 'react';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { useI18n } from '../context/i18nContext';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 interface Resource {
   id: number;
   title: string;
@@ -34,7 +36,7 @@ export default function ResourceInfoModal({ resource, open, onClose }: ResourceI
           <div><span className="font-semibold">{t('file_name') || 'Tên file'}:</span> {resource.originalName}</div>
           <div><span className="font-semibold">{t('upload_date') || 'Ngày tải lên'}:</span> {new Date(resource.createdAt).toLocaleString()}</div>
           <div><span className="font-semibold">{t('status')}:</span> {t(resource.status?.toLowerCase() ?? '')}</div>
-          <div><span className="font-semibold">{t('download_link')}:</span> <a href={`http://localhost:5000/api/resources/download/${resource.fileUrl.split('/').pop()}`} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{t('download')}</a></div>
+          <div><span className="font-semibold">{t('download_link')}:</span> <a href={`${API_URL}/api/resources/download/${resource.fileUrl.split('/').pop()}`} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{t('download')}</a></div>
         </div>
       </div>
     </div>

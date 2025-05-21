@@ -9,6 +9,8 @@ import React from 'react';
 import { useI18n } from '../context/i18nContext';
 import { useRouter } from 'next/navigation';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function Header({ title }: { title: string }) {
   const { setAuthenticated, setUserRole } = useAuth();
   const { setIsMobileOpen } = useSidebar();
@@ -18,7 +20,7 @@ export default function Header({ title }: { title: string }) {
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:5000/api/auth/logout', {
+      await fetch(`${API_URL}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });

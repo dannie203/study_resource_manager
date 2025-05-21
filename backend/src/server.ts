@@ -58,6 +58,22 @@ app.use('/uploads', express.static(UPLOADS_DIR));
 //   });
 // }
 
+// Log all API requests and responses
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`[API] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
+    if (res.statusCode >= 400) {
+      console.log('  Request headers:', req.headers);
+      if (req.body && Object.keys(req.body).length > 0) {
+        console.log('  Request body:', req.body);
+      }
+    }
+  });
+  next();
+});
+
 // ✅ Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/resources', resourceRoutes);
