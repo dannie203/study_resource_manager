@@ -1,16 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background-light: #f8fafc;
+  --clr-green-dark: #386641;
+  --clr-green: #6a994e;
+  --clr-green-light: #a7c957;
+  --clr-cream: #f2e8cf;
+  --clr-red: #bc4749;
+
+  --background-light: var(--clr-cream);
   --background-dark: #18181b;
-  --foreground-light: #18181b;
+  --foreground-light: var(--clr-green-dark);
   --foreground-dark: #f3f4f6;
-  --primary: #2563eb;
-  --primary-dark: #60a5fa;
-  --sidebar-light: #15803d; /* trùng với text-green-700 */
+  --primary: var(--clr-green-dark);
+  --primary-dark: var(--clr-green);
+  --sidebar-light: var(--clr-green);
   --sidebar-dark: #23272f;
   --card-light: #fff;
   --card-dark: #23272f;
+  --accent: var(--clr-green-light);
+  --danger: var(--clr-red);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -33,7 +41,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
   transition: background 0.2s, color 0.2s;
 }
 
@@ -44,10 +52,49 @@ body {
 
 .card-bg {
   background: var(--card);
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px 0 rgba(56,102,65,0.08);
 }
 
 .sidebar-bg {
   background: var(--sidebar);
+  color: #fff;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.btn-danger:hover {
+  filter: brightness(0.95);
+}
+
+input, select, textarea {
+  border-radius: 0.5rem;
+  border: 1px solid var(--clr-green-light);
+  background: #fff;
+  color: var(--clr-green-dark);
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+  outline: none;
 }
 
 /* Hide Next.js watermark */

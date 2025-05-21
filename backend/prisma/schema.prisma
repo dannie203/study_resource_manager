@@ -24,6 +24,7 @@ model User {
   Resource             Resource[]
   downloadLogs         DownloadLog[]
   role                 Role       @default(USER)
+  avatar               String?    // URL ảnh đại diện hoặc null
 }
 
 model Resource {

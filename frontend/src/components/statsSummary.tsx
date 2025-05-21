@@ -12,9 +12,8 @@ export default function StatsSummary() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem('token');
         const res = await fetch('http://localhost:5000/api/resources/stats', {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         });
         const data = await res.json();
         setStats(data);
@@ -22,9 +21,8 @@ export default function StatsSummary() {
     };
     const fetchUserStats = async () => {
       try {
-        const token = localStorage.getItem('token');
         const res = await fetch('http://localhost:5000/api/users/stats', {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         });
         const data = await res.json();
         setUserStats(data);

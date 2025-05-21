@@ -16,24 +16,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const pathname = usePathname();
 
+  // Lấy role từ cookie bằng cách gọi API /api/users/me (nếu đã đăng nhập)
   useEffect(() => {
-    const syncAuth = () => {
-      const token = localStorage.getItem('token');
-      setIsAuthenticated(!!token);
-      if (token) {
-        try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          setUserRole(payload.role ?? null);
-        } catch {
+    const fetchRole = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/users/me', { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          setUserRole(data.role ?? null);
+          setIsAuthenticated(true);
+        } else {
+          console.error('>> Failed to fetch user role');
+          console.error('>> Response status:', res.status);
+          console.error('>> Response status text:', res.statusText);
           setUserRole(null);
+          setIsAuthenticated(false);
         }
-      } else {
+      } catch {
         setUserRole(null);
+        setIsAuthenticated(false);
       }
     };
-    syncAuth();
-    window.addEventListener('storage', syncAuth);
-    return () => window.removeEventListener('storage', syncAuth);
+    fetchRole();
   }, [pathname, children]);
 
   return (

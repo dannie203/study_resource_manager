@@ -12,9 +12,8 @@ export default function DownloadChart() {
   const [interval, setInterval] = useState("day");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     fetch(`http://localhost:5000/api/resources/download-chart?interval=${interval}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include',
     })
       .then((res) => res.json())
       .then(setData);

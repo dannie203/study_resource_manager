@@ -1,36 +1,63 @@
+'use client';
+
+import { useI18n } from "@/context/i18nContext";
+import { GlobeAltIcon } from '@heroicons/react/24/outline';
+import { useEffect } from "react";
+import { useAuth } from "@/context/authContext";
+
 export default function LandingPage() {
+  const { t, language, setLanguage } = useI18n();
+  const { isAuthenticated, userRole } = useAuth();
+  const router = typeof window !== 'undefined' ? require('next/navigation').useRouter() : null;
+
+  useEffect(() => {
+    // Chỉ redirect khi đang ở đúng trang landing ("/") và đã đăng nhập
+    // Không ép admin sang /admin nếu họ muốn vào /dashboard
+    if (isAuthenticated && router && window.location.pathname === '/') {
+      if (userRole === 'ADMIN') router.push('/admin');
+      else router.push('/dashboard');
+    }
+  }, [isAuthenticated, userRole, router]);
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-neutral-950 px-4">
+    <main className="min-h-screen flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-neutral-950 px-4 relative">
+      {/* Language selector icon */}
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+        <button
+          aria-label="Change language"
+          className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-neutral-800 transition"
+          onClick={() => setLanguage(language === 'vi' ? 'en' : 'vi')}
+        >
+          <GlobeAltIcon className="w-6 h-6 text-green-700" />
+        </button>
+        <span className="text-xs font-semibold text-green-700 select-none">{language === 'vi' ? 'VI' : 'EN'}</span>
+      </div>
       <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-        Chào mừng đến với Mấy Đứa Hay Học!
+        {t('landing_welcome')}
       </h1>
       <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-xl">
-        đây là một sản phẩm của Mấy Đứa Hay Học, nơi bạn có thể tìm kiếm và chia sẻ tài liệu học tập một cách dễ dàng và nhanh chóng.
+        {t('landing_desc')}
       </p>
-      
-      {/* Group all buttons vertically */}
       <div className="flex flex-col items-center space-y-2">
         <div className="flex space-x-4">
           <a
             href="/auth/login"
-            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
           >
-            Đăng nhập
+            {t('login')}
           </a>
           <a
             href="/auth/register"
-            className="px-6 py-3 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition"
+            className="px-6 py-3 border border-green-600 text-green-600 rounded-md hover:bg-green-50 transition"
           >
-            Tạo tài khoản
+            {t('register')}
           </a>
         </div>
-
-        {/* Smaller forgot password button centered below */}
         <a
           href="/auth/forgot-password"
-          className="text-sm text-blue-500 hover:underline"
+          className="text-sm text-green-500 hover:underline"
         >
-          Quên mật khẩu?
+          {t('forgot_password')}
         </a>
       </div>
     </main>

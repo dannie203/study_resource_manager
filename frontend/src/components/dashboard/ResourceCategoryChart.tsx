@@ -11,9 +11,8 @@ export default function ResourceCategoryChart() {
   const [data, setData] = useState<CategoryStat[]>([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     fetch("http://localhost:5000/api/resources/category-stats", {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include',
     })
       .then((res) => res.json())
       .then(setData);

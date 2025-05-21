@@ -5,7 +5,8 @@ import {
   requestPasswordReset,
   resetPassword,
   validateResetToken,
-  refreshToken
+  refreshToken,
+  logout // Thêm logout controller
 } from '../controllers/authController';
 
 const router = express.Router();
@@ -22,5 +23,6 @@ router.post('/request-reset', asyncHandler(requestPasswordReset));
 router.post('/reset-password', asyncHandler(resetPassword));
 router.get('/validate-reset-token', asyncHandler(validateResetToken));
 router.post('/refresh-token', asyncHandler(refreshToken));
+router.post('/logout', asyncHandler(logout)); // Thêm route logout
 
 export default router;

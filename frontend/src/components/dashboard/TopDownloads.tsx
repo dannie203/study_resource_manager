@@ -13,9 +13,8 @@ export default function TopDownloads() {
   const [resources, setResources] = useState<Resource[]>([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     fetch("http://localhost:5000/api/resources/top-downloads?limit=5", {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include',
     })
       .then((res) => res.json())
       .then(setResources);

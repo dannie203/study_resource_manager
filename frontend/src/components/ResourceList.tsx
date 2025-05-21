@@ -17,6 +17,8 @@ interface Resource {
   status?: string; // Thêm trường status để nhận đúng dữ liệu từ backend
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function ResourceList() {
   const { t } = useI18n();
   const [resources, setResources] = useState<Resource[]>([]);
@@ -27,19 +29,10 @@ export default function ResourceList() {
 
   useEffect(() => {
     const fetchResources = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Bạn chưa đăng nhập.');
-        setLoading(false);
-        return;
-      }
       try {
-        const res = await fetch('http://localhost:5000/api/resources', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(`${API_URL}/api/resources`, { credentials: 'include' });
         if (res.status === 401) {
           toast.error('Phiên đăng nhập hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.');
-          localStorage.removeItem('token');
           setTimeout(() => window.location.href = '/auth/login', 1500);
           setResources([]);
           return;
@@ -53,14 +46,14 @@ export default function ResourceList() {
         const data = await res.json();
         setResources(data);
       } catch (err) {
-        toast.error('Lỗi kết nối đến server. Vui lòng kiểm tra mạng hoặc thử lại sau!');
+        toast.error('Lỗi kết nối máy chủ!');
         setResources([]);
       } finally {
         setLoading(false);
       }
     };
     fetchResources();
-  }, []);
+  }, [t]);
 
   const filtered = resources.filter(r => r.title.toLowerCase().includes(search.toLowerCase()) || r.subject.toLowerCase().includes(search.toLowerCase()) || r.originalName.toLowerCase().includes(search.toLowerCase()));
   const paged = filtered.slice((page-1)*pageSize, page*pageSize);

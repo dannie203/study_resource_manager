@@ -59,10 +59,10 @@ Web chạy tại: http://localhost:3000
 
 ## 7. Refresh Token Usage (For Developers)
 
-### How it works
-- When you log in, you receive both an access token (`token`) and a `refreshToken` from the backend.
-- The access token is used for authenticating API requests and is stored in `localStorage` as `token`.
-- If your access token expires (e.g., you see a 401 Unauthorized error), the frontend can use the `refreshToken` to obtain a new access token by calling:
+### Cách thức hoạt động
+- Khi bạn đăng nhập bạn sẽ nhận được token truy cập (`token`) và (`refreshToken`) từ backend.
+- Token truy cập có chức năng xác thực yêu cầu từ API và được tạm lưu trong `localStorage` dưới dạng (`token`).
+- Nếu `token` truy cập hết hạn (e.g., bạn thấy thông báo (`401`) Unauthorized), frontend có thể sử dụng `refreshToken` để làm mới `token` bằng cách gọi:
 
 ```ts
 fetch('http://localhost:5000/api/auth/refresh-token', {
@@ -79,13 +79,21 @@ fetch('http://localhost:5000/api/auth/refresh-token', {
   });
 ```
 
-### UI Behavior
-- If your session expires, the system will attempt to refresh your token automatically (if implemented in the frontend logic).
-- If refreshing fails (e.g., refresh token expired), you will be logged out and asked to log in again.
+### Hành vi Giao diện Người dùng
 
-### Notes
-- Never share your refresh token. Keep it secure (ideally, use httpOnly cookies for production).
-- You can implement automatic token refresh in your API request logic (e.g., with a fetch wrapper or interceptor).
+- Nếu phiên đăng nhập của bạn hết hạn, hệ thống sẽ cố gắng **tự động làm mới token** (nếu đã được triển khai trong logic frontend).
+- Nếu làm mới **thất bại** (ví dụ: refresh token đã hết hạn), bạn sẽ **bị đăng xuất** và được yêu cầu đăng nhập lại.
+
+---
+
+### Ghi chú
+
+- **Không bao giờ chia sẻ refresh token.** Hãy giữ nó an toàn.  
+  Tốt nhất là sử dụng cookie có `httpOnly` trong môi trường production. (SẼ ĐƯỢC CẬP NHẬT BỞI OWNER)
+
+- Bạn có thể triển khai cơ chế **làm mới token tự động** trong logic gửi request API.  
+  Ví dụ: sử dụng một **fetch wrapper** hoặc **interceptor**.
+
 
 ## 8. Đóng góp & liên hệ
 - Liên hệ: mayduahayhoc@gmail.com

@@ -4,6 +4,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import { useEffect } from 'react';
 import UserTable from '@/components/UserTable';
+import { useI18n } from "@/context/i18nContext";
 
 interface User {
   id: string;
@@ -13,6 +14,8 @@ interface User {
   createdAt: string;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,22 +23,14 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 10;
+  const { t } = useI18n();
 
   const fetchUsers = async () => {
     setLoading(true);
-    const token = localStorage.getItem('token');
-    if (!token) {
-      toast.error('Bạn chưa đăng nhập.');
-      setLoading(false);
-      return;
-    }
     try {
-      const res = await fetch('http://localhost:5000/api/users', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(`${API_URL}/api/users`, { credentials: 'include' });
       if (res.status === 401) {
-        toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
-        localStorage.removeItem('token');
+        toast.error(t('session_expired'));
         setTimeout(() => window.location.href = '/auth/login', 1500);
         setUsers([]);
         setLoading(false);
@@ -43,7 +38,7 @@ export default function AdminUsersPage() {
       }
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.error ?? 'Lỗi máy chủ khi lấy danh sách user!');
+        toast.error(data.error ?? t('fetch_user_error'));
         setUsers([]);
         setLoading(false);
         return;
@@ -51,7 +46,7 @@ export default function AdminUsersPage() {
       const data = await res.json();
       setUsers(data);
     } catch (err) {
-      toast.error('Lỗi kết nối đến server. Vui lòng thử lại sau!');
+      toast.error(t('fetch_user_error'));
       setUsers([]);
     } finally {
       setLoading(false);
@@ -63,69 +58,56 @@ export default function AdminUsersPage() {
   }, []);
 
   const handlePromote = async (id: string) => {
-    toast.loading('Đang cấp quyền...');
-    const token = localStorage.getItem('token');
-    if (!token) {
-      toast.dismiss();
-      toast.error('Bạn chưa đăng nhập.');
-      return;
-    }
+    toast.loading(t('promote_admin'));
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${id}/role`, {
+      const res = await fetch(`${API_URL}/api/users/${id}/role`, {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ role: 'ADMIN' }),
       });
       toast.dismiss();
       if (res.status === 401) {
-        toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
-        localStorage.removeItem('token');
+        toast.error(t('session_expired'));
         setTimeout(() => window.location.href = '/auth/login', 1500);
         return;
       }
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.error ?? 'Có lỗi khi cấp quyền!');
+        toast.error(data.error ?? t('promote_error'));
         return;
       }
-      toast.success('Đã cấp quyền Admin!');
+      toast.success(t('promote_success'));
       fetchUsers();
     } catch {
       toast.dismiss();
-      toast.error('Lỗi kết nối đến server.');
+      toast.error(t('fetch_user_network_error'));
     }
   };
 
   const handleDelete = async (id: string) => {
-    toast.loading('Đang xoá...');
-    const token = localStorage.getItem('token');
-    if (!token) {
-      toast.dismiss();
-      toast.error('Bạn chưa đăng nhập.');
-      return;
-    }
+    toast.loading(t('delete_user'));
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${id}`, {
+      const res = await fetch(`${API_URL}/api/users/${id}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       toast.dismiss();
       if (res.status === 401) {
-        toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
-        localStorage.removeItem('token');
+        toast.error(t('session_expired'));
         setTimeout(() => window.location.href = '/auth/login', 1500);
         return;
       }
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.error ?? 'Có lỗi khi xoá!');
+        toast.error(data.error ?? t('delete_error_user'));
         return;
       }
-      toast.success('Đã xoá thành công!');
+      toast.success(t('delete_success_user'));
       fetchUsers();
     } catch {
       toast.dismiss();
-      toast.error('Lỗi kết nối đến server.');
+      toast.error(t('fetch_user_network_error'));
     }
   };
 
@@ -137,7 +119,7 @@ export default function AdminUsersPage() {
     <div className="flex min-h-screen sidebar-bg text-gray-900 font-sans">
       <div className="flex flex-col flex-1">
         <main className="p-6 max-w-6xl mx-auto w-full main-bg">
-          <h1 className="text-2xl font-bold mb-6 text-green-800">Danh sách người dùng</h1>
+          <h1 className="text-2xl font-bold mb-6 text-green-800">{t('user_list_heading')}</h1>
           <UserTable
             users={users}
             loading={loading}
@@ -158,8 +140,8 @@ export default function AdminUsersPage() {
               if (confirm.id && confirm.action === 'promote') handlePromote(confirm.id);
               if (confirm.id && confirm.action === 'delete') handleDelete(confirm.id);
             }}
-            title={confirm.action === 'promote' ? 'Cấp quyền Admin' : 'Xoá user'}
-            description={confirm.action === 'promote' ? 'Bạn có chắc muốn cấp quyền Admin cho user này?' : 'Bạn có chắc muốn xoá user này?'}
+            title={confirm.action === 'promote' ? t('confirm_promote_title') : t('confirm_delete_title')}
+            description={confirm.action === 'promote' ? t('confirm_promote_desc') : t('confirm_delete_desc')}
           />
         </main>
       </div>

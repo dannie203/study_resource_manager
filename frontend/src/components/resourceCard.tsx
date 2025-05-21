@@ -31,10 +31,10 @@ export default function ResourceCard({ resource, onDelete }: { resource: Resourc
 
   const handleApprove = async () => {
     try {
-      const token = localStorage.getItem('token');
       const res = await fetch(`http://localhost:5000/api/resources/admin/${resource.id}/approve`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
       });
       if (!res.ok) throw new Error('Lỗi khi duyệt tài nguyên');
       toast.success('Đã duyệt tài nguyên!');
@@ -44,10 +44,8 @@ export default function ResourceCard({ resource, onDelete }: { resource: Resourc
     }
   };
 
-  
   const handleDelete = async () => {
     try {
-      const token = localStorage.getItem('token');
       let url = '';
       let method = '';
       if (userRole === 'ADMIN') {
@@ -59,7 +57,7 @@ export default function ResourceCard({ resource, onDelete }: { resource: Resourc
       }
       const res = await fetch(url, {
         method,
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       if (!res.ok) throw new Error('Lỗi khi xóa tài nguyên');
       toast.success('Đã xóa tài nguyên!');

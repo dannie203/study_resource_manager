@@ -1,0 +1,7 @@
+// Một số avatar mặc định đẹp, free (có thể dùng trực tiếp):
+// https://ui-avatars.com/api/?name=User&background=8BC34A&color=fff&size=128
+// https://api.dicebear.com/7.x/identicon/svg?seed=default
+// https://api.dicebear.com/7.x/bottts/svg?seed=default
+// https://api.dicebear.com/7.x/avataaars/svg?seed=default
+// ...
+// Gợi ý: dùng DiceBear hoặc UI Avatars, đổi seed theo username/email để random.
