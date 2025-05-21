@@ -1,5 +1,4 @@
 'use client';
-
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { useSidebar } from '@/context/sidebarContext';
 import { useAuth } from '@/context/authContext';
@@ -21,24 +20,51 @@ export default function Header({ title }: { title: string }) {
   };
 
   return (
-    <header className="w-full h-[80px] flex items-center justify-between px-8 card-bg shadow-lg rounded-b-2xl mb-4 transition-colors border-b border-gray-200">
-      <div className="flex items-center gap-3">
-        <img src="/favicon.ico" alt="Logo" className="w-8 h-8" />
-        <h1 className="text-3xl font-bold tracking-wide text-green-700 drop-shadow">{title}</h1>
+    <header className="w-full h-[80px] flex items-center justify-between px-8 bg-gradient-to-r from-[#386641] to-[#2A4B30] shadow-[0_4px_20px_rgba(56,102,65,0.5)] mb-4 transition-all duration-300">
+      <div className="flex items-center gap-4">
+        <img
+          src="/favicon.ico"
+          alt="Logo"
+          className="w-12 h-12 transform hover:scale-110 transition-transform duration-300 animate-pulse shadow-[0_0_15px_rgba(167,201,87,0.8)]"
+        />
+        <h1
+          className="text-3xl font-extrabold tracking-wider text-[#A7C957] drop-shadow-[0_0_8px_rgba(167,201,87,0.6)]"
+          style={{ fontFamily: "'Orbitron', sans-serif" }}
+        >
+          {title}
+        </h1>
       </div>
       <div className="flex items-center gap-4">
         <select
           value={language}
-          onChange={e => setLanguage(e.target.value as 'vi' | 'en')}
-          className="px-2 py-1 rounded border border-gray-300 bg-white text-green-700 font-semibold"
+          onChange={(e) => setLanguage(e.target.value as 'vi' | 'en')}
+          className="
+            px-4 py-2 bg-transparent border-2 border-[#A7C957]/50 text-[#A7C957] font-semibold
+            hover:border-[#A7C957] hover:shadow-[0_0_10px_rgba(167,201,87,0.6)] focus:ring-0
+            transition-all duration-300 appearance-none
+          "
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23A7C957' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 0.75rem center',
+            backgroundSize: '1.2em 1.2em',
+          }}
           aria-label="Language selector"
         >
-          <option value="vi">Tiếng Việt</option>
-          <option value="en">English</option>
+          <option value="vi" className="bg-[#2A4B30] text-[#A7C957]">
+            Tiếng Việt
+          </option>
+          <option value="en" className="bg-[#2A4B30] text-[#A7C957]">
+            English
+          </option>
         </select>
         <button
           onClick={handleLogout}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-colors font-semibold"
+          className="
+            px-4 py-2 bg-transparent border-2 border-[#A7C957]/50 text-[#A7C957] font-semibold
+            hover:bg-[#A7C957]/20 hover:border-[#A7C957] hover:shadow-[0_0_10px_rgba(167,201,87,0.6)]
+            transition-all duration-300
+          "
         >
           {t('logout')}
         </button>

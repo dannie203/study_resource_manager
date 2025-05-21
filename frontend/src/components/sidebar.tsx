@@ -11,7 +11,6 @@ import { useI18n } from '../context/i18nContext';
 
 export default function Sidebar() {
   const { t } = useI18n();
-
   return (
     <aside className="sidebar-bg w-64 min-h-screen flex flex-col py-8 px-4 text-green-900">
       <div className="font-extrabold text-2xl text-white mb-8 tracking-wide flex items-center gap-2">
