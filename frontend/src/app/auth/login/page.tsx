@@ -12,10 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      router.push('/dashboard');
-    }
+    // Đã loại bỏ kiểm tra localStorage token, rely on cookie-based auth
   }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -31,19 +28,31 @@ export default function LoginPage() {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ identifier, password }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/login`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ identifier, password }),
+        }
+      );
 
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem('token', data.token);
-        window.location.reload(); // Reload để AuthProvider cập nhật context
+        // Không lưu token vào localStorage nữa, rely on cookie
+        let role = data.user?.role;
+        if (!role && data.user) {
+          // fallback: fetch /api/users/me để lấy role nếu cần
+        }
+        if (role === 'ADMIN') {
+          router.push('/admin');
+        } else {
+          router.push('/dashboard');
+        }
       } else {
         setError(data.error ?? t('login_failed'));
       }

@@ -13,6 +13,7 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
         id: true,
         username: true,
         email: true,
+        avatar: true
       },
     });
 
@@ -21,8 +22,7 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    res.setHeader('Cache-Control', 'no-store'); // Không cho phép cache, luôn trả về 200
-    res.json(user); 
+    res.json({ ...user, role: (req as any).user?.role }); // Trả về role lấy từ middleware
   } catch (error) {
     console.error('Lỗi khi lấy thông tin user:', error);
     res.status(500).json({ error: 'Lỗi máy chủ' });
@@ -38,6 +38,7 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
         email: true,
         role: true,
         createdAt: true,
+        avatar: true
       },
     });
     res.json(users);
@@ -54,7 +55,7 @@ export const updateUserRole = async (req: Request, res: Response): Promise<void>
     const user = await prisma.user.update({
       where: { id },
       data: { role },
-      select: { id: true, username: true, email: true, role: true },
+      select: { id: true, username: true, email: true, role: true, avatar: true },
     });
     res.json(user);
   } catch (error) {
@@ -71,6 +72,23 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
   } catch (error) {
     console.error('Lỗi khi xoá user:', error);
     res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+};
+
+export const uploadAvatar = async (req: Request, res: Response): Promise<void> => {
+  const userId = (req as any).user?.id;
+  if (!req.file) {
+    res.status(400).json({ error: 'Không có file được upload.' });
+    return;
+  }
+  // Đường dẫn avatar mới
+  const avatarUrl = `/avatar/${req.file.filename}`;
+  try {
+    await prisma.user.update({ where: { id: userId }, data: { avatar: avatarUrl } });
+    res.json({ avatar: avatarUrl });
+  } catch (error) {
+    console.error('Lỗi khi cập nhật avatar:', error);
+    res.status(500).json({ error: 'Lỗi máy chủ khi cập nhật avatar.' });
   }
 };
 

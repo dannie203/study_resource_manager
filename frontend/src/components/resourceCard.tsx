@@ -11,6 +11,8 @@ import { useAuth } from '../context/authContext';
 import ResourceInfoModal from './ResourceInfoModal';
 import { useI18n } from '../context/i18nContext';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 interface Resource {
   id: number;
   title: string;
@@ -31,10 +33,10 @@ export default function ResourceCard({ resource, onDelete }: { resource: Resourc
 
   const handleApprove = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/resources/admin/${resource.id}/approve`, {
+      const res = await fetch(`${API_URL}/api/resources/admin/${resource.id}/approve`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
       });
       if (!res.ok) throw new Error('Lỗi khi duyệt tài nguyên');
       toast.success('Đã duyệt tài nguyên!');
@@ -44,22 +46,20 @@ export default function ResourceCard({ resource, onDelete }: { resource: Resourc
     }
   };
 
-  
   const handleDelete = async () => {
     try {
-      const token = localStorage.getItem('token');
       let url = '';
       let method = '';
       if (userRole === 'ADMIN') {
-        url = `http://localhost:5000/api/resources/admin/${resource.id}`;
+        url = `${API_URL}/api/resources/admin/${resource.id}`;
         method = 'DELETE';
       } else {
-        url = `http://localhost:5000/api/resources/${resource.id}`;
+        url = `${API_URL}/api/resources/${resource.id}`;
         method = 'DELETE';
       }
       const res = await fetch(url, {
         method,
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       if (!res.ok) throw new Error('Lỗi khi xóa tài nguyên');
       toast.success('Đã xóa tài nguyên!');
@@ -86,7 +86,7 @@ export default function ResourceCard({ resource, onDelete }: { resource: Resourc
           <div className="text-xs text-gray-400 font-mono select-text">{t('upload_date') ?? 'Ngày tải lên'}: {new Date(resource.createdAt).toLocaleDateString()}</div>
           <div className="mt-auto flex items-center justify-between pt-2">
             <a
-              href={`http://localhost:5000/api/resources/download/${resource.fileUrl.split('/').pop()}`}
+              href={`${API_URL}/api/resources/download/${resource.fileUrl.split('/').pop()}`}
               className="bg-green-600 text-white text-xs px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 transition-colors font-semibold shadow"
               download={resource.originalName}
               onClick={handleDownload}

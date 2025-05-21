@@ -38,10 +38,14 @@ export const register = async (req: Request, res: Response): Promise<Response> =
     const newUser = await prisma.user.create({
       data: { email, username, password: hashedPassword }
     });
-
     return res.status(201).json({
       message: 'Tạo tài khoản thành công.',
-      userId: newUser.id
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        avatar: newUser.avatar ?? null
+      }
     });
 
   } catch (err) {
@@ -63,33 +67,61 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     const user = await prisma.user.findFirst({
       where: { OR: [{ username: identifier }, { email: identifier }] }
     });
-
     if (!user) {
       return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
     }
-
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Sai mật khẩu.' });
     }
-
     const token = generateToken({ id: user.id, role: user.role }, '1d');
     const refreshToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET!, { expiresIn: '7d' });
-
+    // Set JWT as httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
     return res.json({
       message: 'Đăng nhập thành công.',
-      token,
-      refreshToken,
       user: {
         id: user.id,
         username: user.username,
-        email: user.email
+        email: user.email,
+        avatar: user.avatar ?? null
       }
     });
 
   } catch (err) {
     console.error('Lỗi đăng nhập:', err);
     return res.status(500).json({ error: 'Không thể đăng nhập. Vui lòng thử lại sau.' });
+  }
+};
+
+// Đăng xuất: xóa cookie token và refreshToken
+export const logout = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    });
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    });
+    return res.json({ message: 'Đăng xuất thành công.' });
+  } catch (err) {
+    console.error('Lỗi đăng xuất:', err);
+    return res.status(500).json({ error: 'Không thể đăng xuất. Vui lòng thử lại sau.' });
   }
 };
 

@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { PrismaClient } from '@prisma/client';
 import { decodeFileName } from '../utils/stringHelper';
+import { scanFile } from '../utils/clamav';
 
 const prisma = new PrismaClient();
 
@@ -65,6 +66,14 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
         return res.status(401).json({ error: 'Unauthorized: Invalid user ID.' });
       }
 
+      // Quét virus bằng ClamAV
+      const scanResult = await scanFile(req.file.path);
+      if (scanResult.isInfected) {
+        // Xóa file nhiễm virus
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ error: `File bị nhiễm virus: ${scanResult.viruses?.join(', ') || 'Unknown malware'}` });
+      }
+
       // Decode POST-ed data
       const fileName: string | null = decodeFileName(req.file.originalname);
       if(!fileName) {
@@ -72,7 +81,6 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
       }
 
       const resource = await prisma.resource.create({
-      // const fileName: string | null = decodeFileName(file.originalname);
         data: {
           title,
           subject,

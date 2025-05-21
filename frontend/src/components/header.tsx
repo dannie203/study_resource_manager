@@ -6,17 +6,31 @@ import { useEffect, useState } from 'react';
 import useBreakpoint from '@/hooks/useBreakpoint';
 import React from 'react';
 import { useI18n } from '../context/i18nContext';
+import { useRouter } from 'next/navigation';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function Header({ title }: { title: string }) {
-  const { setAuthenticated } = useAuth();
+  const { setAuthenticated, setUserRole } = useAuth();
   const { setIsMobileOpen } = useSidebar();
   const { isMobile } = useBreakpoint();
   const { language, setLanguage, t } = useI18n();
+  const router = useRouter();
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setAuthenticated(false);
-    window.location.href = '/auth/login';
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      // Không cần xóa cookie bằng document.cookie vì cookie httpOnly chỉ backend mới xóa được
+    } catch (err) {
+      // Có thể log lỗi nếu cần
+    } finally {
+      setAuthenticated(false);
+      setUserRole(null);
+      router.replace('/'); // Chuyển về landing page sau khi logout
+    }
   };
 
   return (

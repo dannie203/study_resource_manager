@@ -23,19 +23,29 @@ const translations: Record<Language, Record<string, string>> = {
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>('vi');
+  const [translations, setTranslations] = useState<Record<string, string>>({});
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const lang = (typeof window !== 'undefined') ? (localStorage.getItem('language') as Language) : 'vi';
     setLanguage(lang || 'vi');
-    setIsReady(true);
   }, []);
 
   useEffect(() => {
-    if (isReady) localStorage.setItem('language', language);
-  }, [language, isReady]);
+    async function loadTranslations() {
+      try {
+        const data = await import(`../locales/${language}.json`);
+        setTranslations(data.default || {});
+      } catch {
+        setTranslations({});
+      }
+      setIsReady(true);
+    }
+    loadTranslations();
+    if (typeof window !== 'undefined') localStorage.setItem('language', language);
+  }, [language]);
 
-  const t = (key: string) => translations[language][key] || key;
+  const t = (key: string) => translations[key] || key;
 
   if (!isReady) return null;
 

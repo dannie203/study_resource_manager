@@ -98,13 +98,38 @@ export const downloadFile = async (req: Request, res: Response): Promise<void> =
 // Tổng quan: tổng số tài nguyên, upload, download
 export const getResourceStats = async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
-  // Tổng số tài nguyên đã được duyệt của user
-  const totalResources = await prisma.resource.count({ where: { createdBy: userId, status: 'APPROVED' } });
-  // Tổng số lượt tải lên (mọi trạng thái)
-  const totalUploads = await prisma.resource.count({ where: { createdBy: userId } });
-  // Tổng số lượt tải xuống (tổng số download của user)
-  const totalDownloads = await prisma.downloadLog.count({ where: { userId } });
-  res.json({ totalResources, totalUploads, totalDownloads });
+  const role = (req as any).user?.role;
+  let totalApprovedResources = 0, userApprovedResources = 0, adminApprovedResources = 0;
+  let totalUploads = 0, totalDownloads = 0;
+
+  if (role === 'ADMIN') {
+    // Tổng số tài nguyên đã duyệt toàn hệ thống
+    totalApprovedResources = await prisma.resource.count({ where: { status: 'APPROVED' } });
+    // Số tài nguyên đã duyệt của user hiện tại
+    userApprovedResources = await prisma.resource.count({ where: { createdBy: userId, status: 'APPROVED' } });
+    // Số tài nguyên đã duyệt của admin (nếu cần tách riêng)
+    adminApprovedResources = await prisma.resource.count({ where: { status: 'APPROVED', user: { role: 'ADMIN' } } });
+    // Tổng số upload và download của user hiện tại
+    totalUploads = await prisma.resource.count({ where: { createdBy: userId } });
+    totalDownloads = await prisma.downloadLog.count({ where: { userId } });
+    res.json({
+      totalApprovedResources,
+      userApprovedResources,
+      adminApprovedResources,
+      totalUploads,
+      totalDownloads
+    });
+  } else {
+    // User thường
+    userApprovedResources = await prisma.resource.count({ where: { createdBy: userId, status: 'APPROVED' } });
+    totalUploads = await prisma.resource.count({ where: { createdBy: userId } });
+    totalDownloads = await prisma.downloadLog.count({ where: { userId } });
+    res.json({
+      userApprovedResources,
+      totalUploads,
+      totalDownloads
+    });
+  }
 };
 
 // Thống kê phân loại tài nguyên
@@ -211,7 +236,7 @@ export const deleteResource = async (req: Request, res: Response): Promise<void>
     res.json({ success: true });
   } catch (error) {
     console.error('Lỗi khi xoá tài nguyên:', error);
-    res.status(500).json({ error: 'Lỗi máy chủ' });
+    res.status(500).json({ error: 'Lỗi khi xóa tài nguyên' });
   }
 };
 

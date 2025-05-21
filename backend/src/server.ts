@@ -4,8 +4,7 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
-import morgan from 'morgan';
-import expressStatusMonitor from 'express-status-monitor';
+import cookieParser from 'cookie-parser';
 
 // Load routes
 import authRoutes from './routes/auth';
@@ -21,12 +20,6 @@ const PORT = Number(process.env.PORT) || 5000;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:3000';
 const UPLOADS_DIR = path.join(__dirname, '../uploads');
 
-// ✅ Monitoring
-app.use(expressStatusMonitor());
-
-// ✅ Logging
-app.use(morgan('dev'));
-
 // ✅ Security headers
 app.use(helmet());
 
@@ -39,30 +32,52 @@ app.use(cors({
 // ✅ Body parser
 app.use(express.json());
 
-// ✅ Rate limiting cho toàn bộ API
-// app.use(
-//   rateLimit({
-//     windowMs: 15 * 60 * 1000, // 15 phút
-//     max: 100, // 100 requests mỗi 15 phút
-//     message: 'Too many requests from this IP, please try again after 15 minutes.',
-//   })
-// );
+// ✅ Cookie parser
+app.use(cookieParser());
+
+// ✅ Rate limiting for auth
+app.use(
+  '/api/auth',
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: 'Too many requests from this IP, please try again after 15 minutes.',
+  })
+);
 
 // ✅ Static files: serve uploaded resources
 app.use('/uploads', express.static(UPLOADS_DIR));
 
-// ✅ Audit log middleware (log các thay đổi dữ liệu)
+// // ✅ Log request chi tiết cho debug dev (phải đặt TRƯỚC các route)
+// if (process.env.NODE_ENV !== 'production') {
+//   app.use((req, res, next) => {
+//     console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+//     console.log('  Headers:', req.headers);
+//     console.log('  Cookies:', req.cookies);
+//     next();
+//   });
+// }
+
+// Log all API requests and responses
 app.use((req, res, next) => {
-  if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
-    console.log(`[AUDIT] ${req.method} ${req.originalUrl} - User: ${req.user?.id ?? 'unknown'}`);
-  }
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`[API] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
+    if (res.statusCode >= 400) {
+      console.log('  Request headers:', req.headers);
+      if (req.body && Object.keys(req.body).length > 0) {
+        console.log('  Request body:', req.body);
+      }
+    }
+  });
   next();
 });
 
 // ✅ Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/resources', resourceRoutes);
-app.use('/api/users', userRoutes); // Sửa lại từ 'user' thành 'users' để đúng route
+app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
 
 // ✅ Health check
@@ -77,6 +92,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 // ✅ Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server is running at: http://localhost:${PORT}`);
 });

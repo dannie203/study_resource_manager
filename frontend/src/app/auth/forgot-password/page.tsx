@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -13,7 +15,7 @@ const ForgotPasswordPage = () => {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/request-reset", {
+      const res = await fetch(`${API_URL}/api/auth/request-reset`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

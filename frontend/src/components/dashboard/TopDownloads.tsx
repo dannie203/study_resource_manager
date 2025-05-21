@@ -8,14 +8,15 @@ type Resource = {
   downloadCount: number;
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function TopDownloads() {
   const { t } = useI18n();
   const [resources, setResources] = useState<Resource[]>([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    fetch("http://localhost:5000/api/resources/top-downloads?limit=5", {
-      headers: { Authorization: `Bearer ${token}` },
+    fetch(`${API_URL}/api/resources/top-downloads?limit=5`, {
+      credentials: 'include',
     })
       .then((res) => res.json())
       .then(setResources);

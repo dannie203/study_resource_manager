@@ -4,8 +4,20 @@ import Header from "@/components/header";
 import ResourceList from "@/components/ResourceList";
 import Sidebar from "@/components/sidebar";
 import { Toaster, toast } from 'react-hot-toast';
+import { useAuth } from '@/context/authContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function ResourcesPage() {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace('/auth/login');
+    }
+  }, [isAuthenticated, router]);
+  if (!isAuthenticated) return null;
+
   return (
     <div className="flex min-h-screen bg-gray-50 text-gray-900 font-sans">
       <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
