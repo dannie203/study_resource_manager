@@ -78,7 +78,7 @@ export default function UsersProfile() {
       });
       const data = await res.json();
       if (res.ok) {
-        toast.success(t('avatar_update_success'));
+        toast.success(t('avatar_update_success'), { id: 'avatar-success' });
         setProfile((p) => p ? { ...p, avatar: data.avatar } : p);
       } else {
         toast.error(data.error ?? t('avatar_update_error'));
@@ -110,7 +110,7 @@ export default function UsersProfile() {
       if (res.ok && data.avatar) {
         setProfile(p => p ? { ...p, avatar: data.avatar } : p);
         setAvatarFile(null);
-        toast.success(t('avatar_update_success'));
+        toast.success(t('avatar_update_success'), { id: 'avatar-success' });
       } else {
         toast.error(data.error ?? t('avatar_update_error'));
         if (res.status === 401) {

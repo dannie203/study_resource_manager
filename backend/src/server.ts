@@ -48,15 +48,37 @@ app.use(
 // ✅ Static files: serve uploaded resources
 app.use('/uploads', express.static(UPLOADS_DIR));
 
-// // ✅ Log request chi tiết cho debug dev (phải đặt TRƯỚC các route)
-// if (process.env.NODE_ENV !== 'production') {
-//   app.use((req, res, next) => {
-//     console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-//     console.log('  Headers:', req.headers);
-//     console.log('  Cookies:', req.cookies);
-//     next();
-//   });
-// }
+// ✅ Static files: serve avatar images with CORS (fix NotSameOrigin)
+const AVATAR_DIR = path.join(__dirname, '../avatar');
+
+// Tắt helmet cho route /avatar để không set các header same-origin gây block
+app.use('/avatar', (req, res, next) => {
+  // Bỏ các header bảo mật gây block cross-origin
+  res.removeHeader?.('Cross-Origin-Opener-Policy');
+  res.removeHeader?.('Cross-Origin-Resource-Policy');
+  res.removeHeader?.('X-Frame-Options');
+  res.setHeader('Cross-Origin-Opener-Policy', '');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('X-Frame-Options', '');
+  next();
+},
+  cors({
+    origin: CLIENT_ORIGIN,
+    credentials: true,
+  }),
+  express.static(AVATAR_DIR, {
+    setHeaders: (res) => {
+      res.setHeader('Access-Control-Allow-Origin', CLIENT_ORIGIN);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Cross-Origin-Opener-Policy', '');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+      res.setHeader('X-Frame-Options', '');
+    }
+  })
+);
+
+// ✅ Static files: serve public resources  
+app.use('/public', express.static(path.join(__dirname, '../../uploads')));
 
 // Log all API requests and responses
 app.use((req, res, next) => {
