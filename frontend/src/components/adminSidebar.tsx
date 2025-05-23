@@ -45,10 +45,9 @@ export default function AdminSidebar() {
             </div>
           </SidebarHeader>
           <SidebarTrigger
-            className="absolute top-4 -right-4 z-[51] flex text-green-100 bg-[#4A7C59]/80 hover:bg-[#386641]/90 p-1.5 rounded-full shadow transition-colors duration-200 border border-green-700/40"
+            className="absolute top-2 -right-4 z-[51] flex text-green-100 bg-[#4A7C59]/80 hover:bg-[#386641]/90 p-1.5 rounded-full shadow transition-colors duration-200 border border-green-700/40"
             onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
           >
-            <ChevronsLeftRight className={`w-6 h-6 transition-transform duration-300 ${isDesktopCollapsed ? 'rotate-180' : ''}`} />
           </SidebarTrigger>
           <SidebarContent className="px-2 py-4">
             <SidebarGroup>

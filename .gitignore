@@ -31,4 +31,3 @@ coverage/
 CHECKLIST.md
 db/backup.sql
 db/study_resource_manager.sql
-.gitignore
