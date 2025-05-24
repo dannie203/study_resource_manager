@@ -32,21 +32,21 @@ export default function ResourceList() {
       try {
         const res = await fetch(`${API_URL}/api/resources`, { credentials: 'include' });
         if (res.status === 401) {
-          toast.error('Phiên đăng nhập hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.');
+          toast.error('Phiên đăng nhập hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.', { id: 'resource-session-expired' });
           setTimeout(() => window.location.href = '/auth/login', 1500);
           setResources([]);
           return;
         }
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          toast.error(data.error ?? 'Lỗi máy chủ khi lấy tài liệu!');
+          toast.error(data.error ?? 'Lỗi máy chủ khi lấy tài liệu!', { id: 'resource-fetch-error' });
           setResources([]);
           return;
         }
         const data = await res.json();
         setResources(data);
       } catch (err) {
-        toast.error('Lỗi kết nối máy chủ!');
+        toast.error('Lỗi kết nối máy chủ!', { id: 'resource-network-error' });
         setResources([]);
       } finally {
         setLoading(false);

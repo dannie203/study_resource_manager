@@ -41,7 +41,6 @@ export default function UsersProfile() {
         });
         const data = await res.json();
         if (!res.ok) {
-          toast.error(data.error ?? t('avatar_update_error'));
           setProfile(null);
           if (res.status === 401) {
             setTimeout(() => router.replace('/auth/login'), 1000);
@@ -50,14 +49,13 @@ export default function UsersProfile() {
           setProfile(data);
         }
       } catch (err) {
-        toast.error(t('avatar_server_error'));
         setProfile(null);
       } finally {
         setLoading(false);
       }
     };
     fetchProfile();
-  }, [t]);
+  }, []); // Không phụ thuộc t, không gọi toast ở đây
 
   // Hàm upload avatar
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

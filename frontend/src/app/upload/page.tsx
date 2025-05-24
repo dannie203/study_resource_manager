@@ -31,17 +31,17 @@ export default function UploadPage() {
     e.preventDefault();
     setMessage("");
     if (!title.trim()) {
-      toast.error(t('upload_required_title'));
+      toast.error(t('upload_required_title'), { id: 'upload-required-title' });
       setMessage(t('upload_required_title'));
       return;
     }
     if (!subject.trim()) {
-      toast.error(t('upload_required_subject'));
+      toast.error(t('upload_required_subject'), { id: 'upload-required-subject' });
       setMessage(t('upload_required_subject'));
       return;
     }
     if (!file) {
-      toast.error(t('upload_required_file'));
+      toast.error(t('upload_required_file'), { id: 'upload-required-file' });
       setMessage(t('upload_required_file'));
       return;
     }
@@ -63,23 +63,23 @@ export default function UploadPage() {
       const data = await res.json();
       toast.dismiss();
       if (res.status === 401) {
-        toast.error(t('session_expired'));
+        toast.error(t('session_expired'), { id: 'upload-session-expired' });
         setTimeout(() => router.replace('/auth/login'), 1000);
         return;
       }
       if (res.ok) {
-        toast.success(t('upload_success'));
+        toast.success(t('upload_success'), { id: 'upload-success' });
         setMessage(t('upload_success'));
         setTitle("");
         setSubject("");
         setFile(null);
       } else {
-        toast.error(data.error ?? t('upload_error'));
+        toast.error(data.error ?? t('upload_error'), { id: 'upload-error' });
         setMessage(data.error ?? t('upload_error'));
       }
     } catch (err) {
       toast.dismiss();
-      toast.error(t('upload_network_error'));
+      toast.error(t('upload_network_error'), { id: 'upload-network-error' });
       setMessage(t('upload_network_error'));
     } finally {
       setIsSubmitting(false);

@@ -28,7 +28,7 @@ export default function ResourceCard({ resource, onDelete }: { resource: Resourc
   const { t } = useI18n();
   const [showInfo, setShowInfo] = useState(false);
   const handleDownload = async (e: React.MouseEvent<HTMLAnchorElement>) => {
-    toast.success('Bắt đầu tải file!');
+    toast.success('Bắt đầu tải file!', { id: 'download-start' });
   };
 
   const handleApprove = async () => {
@@ -39,10 +39,10 @@ export default function ResourceCard({ resource, onDelete }: { resource: Resourc
         credentials: 'include',
       });
       if (!res.ok) throw new Error('Lỗi khi duyệt tài nguyên');
-      toast.success('Đã duyệt tài nguyên!');
+      toast.success('Đã duyệt tài nguyên!', { id: 'approve-success' });
       if (onDelete) onDelete(resource.id); // Ẩn khỏi danh sách pending
     } catch {
-      toast.error('Duyệt tài nguyên thất bại!');
+      toast.error('Duyệt tài nguyên thất bại!', { id: 'approve-error' });
     }
   };
 
@@ -62,10 +62,10 @@ export default function ResourceCard({ resource, onDelete }: { resource: Resourc
         credentials: 'include',
       });
       if (!res.ok) throw new Error('Lỗi khi xóa tài nguyên');
-      toast.success('Đã xóa tài nguyên!');
+      toast.success('Đã xóa tài nguyên!', { id: 'delete-success' });
       if (onDelete) onDelete(resource.id);
     } catch {
-      toast.error('Xóa tài nguyên thất bại!');
+      toast.error('Xóa tài nguyên thất bại!', { id: 'delete-error' });
     }
   };
 
