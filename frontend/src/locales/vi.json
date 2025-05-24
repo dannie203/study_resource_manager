@@ -73,6 +73,9 @@
   "landing_welcome": "Chào mừng đến với Mấy Đứa Hay Học!",
   "landing_desc": "Đây là một sản phẩm của Mấy Đứa Hay Học, nơi bạn có thể tìm kiếm và chia sẻ tài liệu học tập một cách dễ dàng và nhanh chóng.",
   "forgot_password": "Quên mật khẩu?",
+  "email_address": "Địa chỉ Email",
+  "sending": "Đang gửi...",
+  "send_reset_link": "Gửi liên kết đặt lại",
   "admin_panel": "Bảng điều khiển Admin",
   "admin_product_name": "Study Resource Manager",
   "admin_version": "v1.0 © 2025",
@@ -109,5 +112,6 @@
   "confirm_delete_title": "Xác nhận xóa người dùng",
   "confirm_delete_desc": "Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác.",
   "confirm_promote_title": "Xác nhận nâng quyền người dùng",
-  "confirm_promote_desc": "Bạn có chắc chắn muốn nâng quyền người dùng này thành quản trị viên? Hành động này không thể hoàn tác."
+  "confirm_promote_desc": "Bạn có chắc chắn muốn nâng quyền người dùng này thành quản trị viên? Hành động này không thể hoàn tác.",
+  "your_resources": "Tài liệu của bạn"
 }

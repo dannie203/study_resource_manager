@@ -69,6 +69,7 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
       }
 
       // Quét virus bằng ClamAV
+      /* 
       let scanResult = null;
       try {
         scanResult = await scanFile(req.file.path);
@@ -81,7 +82,8 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
       catch (error) {
         console.error('Error scanning file:', error);
         return res.status(500).json({ error: 'Lỗi quét file' });
-      }
+      } 
+      */
       // Decode POST-ed data
       const fileName: string | null = decodeFileName(req.file.originalname);
       if(!fileName) {

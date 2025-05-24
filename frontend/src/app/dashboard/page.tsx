@@ -7,11 +7,13 @@ import ResourceCategoryChart from '@/components/dashboard/ResourceCategoryChart'
 import DownloadChart from '@/components/dashboard/DownloadChart';
 import TopDownloads from '@/components/dashboard/TopDownloads';
 import { useAuth } from '@/context/authContext';
+import { useI18n } from '@/context/i18nContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function DashboardPage() {
   const { isAuthenticated } = useAuth();
+  const { t } = useI18n();
   const router = useRouter();
   useEffect(() => {
     if (!isAuthenticated) {
@@ -24,7 +26,7 @@ export default function DashboardPage() {
     <div className="flex min-h-screen main-bg text-[var(--clr-green-dark)] font-sans">
       <Sidebar />
       <div className="flex flex-col flex-1">
-        <Header title={"Dashboard"} />
+        <Header title={t('dashboard')} />
         <main className="p-6 max-w-6xl mx-auto w-full main-bg">
           <StatsOverview />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">

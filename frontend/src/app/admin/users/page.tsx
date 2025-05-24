@@ -38,7 +38,7 @@ export default function AdminUsersPage() {
       }
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.error ?? t('fetch_user_error'));
+        toast.error(data.error ?? t('fetch_user_error'), { id: 'admin-fetch-user-error' });
         setUsers([]);
         setLoading(false);
         return;
@@ -77,7 +77,7 @@ export default function AdminUsersPage() {
         toast.error(data.error ?? t('promote_error'));
         return;
       }
-      toast.success(t('promote_success'));
+      toast.success(t('promote_success'), { id: 'promote-success' });
       fetchUsers();
     } catch {
       toast.dismiss();
@@ -103,7 +103,7 @@ export default function AdminUsersPage() {
         toast.error(data.error ?? t('delete_error_user'));
         return;
       }
-      toast.success(t('delete_success_user'));
+      toast.success(t('delete_success_user'), { id: 'delete-user-success' });
       fetchUsers();
     } catch {
       toast.dismiss();
