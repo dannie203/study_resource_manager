@@ -1,6 +1,7 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
+import EN from '../locales/en.json'
+import VI from '../locales/vi.json'
 export type Language = 'vi' | 'en';
 
 interface I18nContextProps {
@@ -14,6 +15,11 @@ const I18nContext = createContext<I18nContextProps>({
   setLanguage: () => {},
   t: (key) => key,
 });
+
+const translations: Record<Language, Record<string, string>> = {
+  vi : VI,
+  en : EN
+};
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>('vi');
